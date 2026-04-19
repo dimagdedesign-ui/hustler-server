@@ -142,14 +142,24 @@ router.post('/', analyseLimiter, async (req, res) => {
     res.json({ ok: true, report });
   } catch (err) {
     console.error('[ANALYSE] ✗ Error:', err.message);
-    const msg = /scrap|reach/i.test(err.message)
-      ? 'Could not scrape the provided URL. Please check the domain and try again.'
-      : /JSON|parse/i.test(err.message)
-        ? 'AI response did not parse. Please retry in a moment.'
-        : /anthropic|api/i.test(err.message)
-          ? 'AI synthesis failed. Please try again in a moment.'
-          : 'Something went wrong generating your report. Please try again.';
-    res.status(500).json({ error: msg, debug: process.env.NODE_ENV === 'development' ? err.message : undefined });
+    console.error(err.stack);
+    const m = err.message || 'Unknown error';
+    const msg = /scrap|reach|robots|ENOTFOUND|ETIMEDOUT/i.test(m)
+      ? `Could not scrape the provided URL — ${m}`
+      : /401|authentication/i.test(m)
+        ? 'Anthropic API key rejected (401). Check ANTHROPIC_API_KEY in Render env vars.'
+        : /429|rate.?limit/i.test(m)
+          ? 'Anthropic rate-limited. Wait a minute and retry.'
+          : /529|overload/i.test(m)
+            ? 'Anthropic is temporarily overloaded. Retry shortly.'
+            : /400|invalid.?request/i.test(m)
+              ? `Anthropic rejected the request: ${m}`
+              : /JSON|parse|Unterminated|Truncated/i.test(m)
+                ? `AI response did not parse — ${m}`
+                : /credit|quota|balance/i.test(m)
+                  ? 'Anthropic quota/credit issue. Check your Anthropic dashboard.'
+                  : `Pipeline error: ${m}`;
+    res.status(500).json({ error: msg, detail: m, stack: err.stack?.split('\n').slice(0, 4).join('\n') });
   }
 });
 
