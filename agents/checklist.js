@@ -20,18 +20,17 @@ ${JSON.stringify(competitor, null, 2).slice(0, 2500)}
 ${JSON.stringify(digital, null, 2).slice(0, 3500)}
 `;
 
-  const json = await callJson({
+  const items = await callJson({
     label: 'AGENT:CL',
     system: CHECKLIST_PROMPT,
-    user: context + priorFindings + '\n\nProduce the 50-item JSON array now. No preamble.',
+    user: context + priorFindings + '\n\nProduce the 50 items now via the submit_report tool call.',
     max_tokens: 20000,
-    prefill: '[',   // checklist output is a top-level array
+    isArray: true,
   });
 
-  // Basic shape validation — the UI depends on the fields being present.
-  if (!Array.isArray(json)) throw new Error('Checklist agent did not return a JSON array');
-  if (json.length < 40) console.warn(`[AGENT:CL] Expected 50 items, got ${json.length}`);
-  return json;
+  if (!Array.isArray(items)) throw new Error('Checklist agent did not return an items array');
+  if (items.length < 40) console.warn(`[AGENT:CL] Expected 50 items, got ${items.length}`);
+  return items;
 }
 
 module.exports = { runChecklistAgent };
