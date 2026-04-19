@@ -32,10 +32,10 @@ function DigitalSection() {
   const d = r.digital || {};
   const top = d.topScores || {};
   const ps = d.pageSpeed;
-  const eeat = d.eeat || [];
-  const geo = d.geo || [];
+  const eeat = window.asArr(d.eeat);
+  const geo = window.asArr(d.geo);
   const keywords = d.keywordSeeds || { tofu: [], mofu: [], bofu: [], note: '' };
-  const tech = (r.scrape?.techStack || []).slice(0, 16);
+  const tech = window.asArr(r.scrape?.techStack).slice(0, 16);
 
   const cwvFailing = ps?.cwv ? ps.cwv.filter(x => !x.pass).length : null;
 
@@ -155,9 +155,9 @@ function DigitalSection() {
         </div>
         <div className="kw-grid" style={{ padding: 20 }}>
           {[
-            { k: 'tofu', title: 'Top of funnel', note: 'Awareness · high volume · low intent', items: keywords.tofu || [] },
-            { k: 'mofu', title: 'Middle of funnel', note: 'Comparison · mid intent', items: keywords.mofu || [] },
-            { k: 'bofu', title: 'Bottom of funnel', note: 'Buy intent · convert 4–6× higher', items: keywords.bofu || [] },
+            { k: 'tofu', title: 'Top of funnel', note: 'Awareness · high volume · low intent', items: window.asArr(keywords.tofu) },
+            { k: 'mofu', title: 'Middle of funnel', note: 'Comparison · mid intent', items: window.asArr(keywords.mofu) },
+            { k: 'bofu', title: 'Bottom of funnel', note: 'Buy intent · convert 4–6× higher', items: window.asArr(keywords.bofu) },
           ].map((c, i) => (
             <div key={i} className="kw-card">
               <div className="kw-lbl">{c.title}</div>
@@ -233,11 +233,11 @@ function BrandSection() {
         <div className="voice-cols">
           <div>
             <div className="lbl ok"><i className="ri-checkbox-circle-line"></i> Do</div>
-            <ul>{(b.voice?.do || []).map((x, i) => <li key={i}>{x}</li>)}</ul>
+            <ul>{window.asArr(b.voice?.do).map((x, i) => <li key={i}>{x}</li>)}</ul>
           </div>
           <div>
             <div className="lbl no"><i className="ri-close-circle-line"></i> Don't</div>
-            <ul>{(b.voice?.dont || []).map((x, i) => <li key={i}>{x}</li>)}</ul>
+            <ul>{window.asArr(b.voice?.dont).map((x, i) => <li key={i}>{x}</li>)}</ul>
           </div>
         </div>
       </div>
@@ -258,19 +258,19 @@ function StrategySection() {
         icon="ri-calendar-schedule-line"
       />
       <div className="phases">
-        {(s.phases || []).map((p, i) => (
+        {window.asArr(s.phases).map((p, i) => (
           <div key={i} className="phase-card">
             <div className="phase-name">{p.name}</div>
-            <ul>{(p.bullets || []).map((b, j) => <li key={j}>{b}</li>)}</ul>
+            <ul>{window.asArr(p.bullets).map((b, j) => <li key={j}>{b}</li>)}</ul>
           </div>
         ))}
       </div>
-      {s.kpis?.length ? (
+      {window.asArr(s.kpis).length ? (
         <div className="card card-pad" style={{ marginTop: 16 }}>
           <div className="card-hd"><h3 style={{ margin: 0 }}>KPI targets</h3></div>
           <table className="tbl" style={{ marginTop: 12 }}>
             <thead><tr><th>KPI</th><th>Target</th></tr></thead>
-            <tbody>{s.kpis.map((k, i) => <tr key={i}><td><strong>{k.name}</strong></td><td>{k.target}</td></tr>)}</tbody>
+            <tbody>{window.asArr(s.kpis).map((k, i) => <tr key={i}><td><strong>{k.name}</strong></td><td>{k.target}</td></tr>)}</tbody>
           </table>
         </div>
       ) : null}
@@ -285,7 +285,7 @@ function SwotSection() {
   const Q = ({ label, items, kind }) => (
     <div className={`swot-q k-${kind}`}>
       <div className="swot-q-hd">{label}</div>
-      <ul>{(items || []).map((x, i) => <li key={i}>{x}</li>)}</ul>
+      <ul>{window.asArr(items).map((x, i) => <li key={i}>{x}</li>)}</ul>
     </div>
   );
   return (
@@ -369,7 +369,7 @@ function DocsSection() {
 function MethodSection() {
   const r = window.REPORT;
   if (!r) return null;
-  const rows = r.methodology || [];
+  const rows = window.asArr(r.methodology);
   const confEmoji = (c) => c === 'high' ? '🟢' : c === 'medium' ? '🟡' : '🔴';
   const confLabel = (c) => c === 'high' ? 'High' : c === 'medium' ? 'Medium' : 'Low';
   return (

@@ -1,6 +1,11 @@
 /* Executive summary + classic 9-block BMC + unit economics.
  * Visually matches the Nova design reference. */
 
+// Defensive array: agents sometimes return objects/nulls where we expect
+// arrays. This keeps the report rendering even on malformed payloads.
+const asArr = (v) => Array.isArray(v) ? v : [];
+window.asArr = asArr;
+
 function SectionEyebrow({ num, title, sub, icon }) {
   return (
     <div className="report-section-hd">
@@ -86,8 +91,8 @@ function ReportHead({ onDownload, downloading }) {
 function SummarySection() {
   const r = window.REPORT;
   if (!r) return null;
-  const bullets = r.executive?.bullets || [];
-  const maturity = r.maturity?.rows || [];
+  const bullets = asArr(r.executive?.bullets);
+  const maturity = asArr(r.maturity?.rows);
 
   return (
     <section id="summary" className="report-section" style={{ paddingTop: 16 }}>
@@ -147,7 +152,7 @@ function SummarySection() {
 function BMCSection() {
   const r = window.REPORT;
   if (!r) return null;
-  const canvas = r.businessModel?.canvas || [];
+  const canvas = asArr(r.businessModel?.canvas);
   const econ = r.businessModel?.unitEcon || {};
 
   const blockMap = {

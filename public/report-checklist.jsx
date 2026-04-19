@@ -110,7 +110,7 @@ function ChecklistSection() {
                   <div className="ci-bd">
                     <div className="ci-why"><strong>Why it matters:</strong> {it.why}</div>
                     {Array.isArray(it.steps) && it.steps.length ? (
-                      <ol className="ci-steps">{it.steps.map((s, i) => <li key={i}>{s}</li>)}</ol>
+                      <ol className="ci-steps">{it.steps.map((s, i) => <li key={i}>{typeof s === 'string' ? s : s?.text || JSON.stringify(s)}</li>)}</ol>
                     ) : null}
                   </div>
                 ) : null}

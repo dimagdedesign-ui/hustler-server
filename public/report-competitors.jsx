@@ -6,7 +6,9 @@
 function CompetitorsSection() {
   const r = window.REPORT;
   if (!r) return null;
-  const list = r.competitor?.list || [];
+  // Accept array OR object-with-numeric-keys from less-disciplined agent outputs.
+  const raw = r.competitor?.list;
+  const list = Array.isArray(raw) ? raw : raw && typeof raw === 'object' ? Object.values(raw) : [];
   const disclaimer = r.competitor?.disclaimer
     || 'Competitors suggested by AI based on niche inference — verify against your own research before acting.';
 
