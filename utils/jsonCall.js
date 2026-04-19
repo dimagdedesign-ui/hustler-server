@@ -99,15 +99,23 @@ function extractJson(text) {
   throw new Error(`Unterminated JSON in response: ${inner.slice(start, start + 300)}…`);
 }
 
-async function callJson({ system, user, max_tokens = 1500, label = 'agent' }) {
+async function callJson({ system, user, max_tokens = 1500, label = 'agent', prefill = '{' }) {
   const started = Date.now();
+
+  // Prefill the assistant turn so the model can't emit preamble before the
+  // JSON value. The API returns the continuation only — we re-prepend the
+  // prefill before parsing.
+  const messages = [{ role: 'user', content: user }];
+  if (prefill) messages.push({ role: 'assistant', content: prefill });
+
   const resp = await client.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens,
     system,
-    messages: [{ role: 'user', content: user }],
+    messages,
   });
-  const text = resp.content[0]?.text || '';
+  const raw = resp.content[0]?.text || '';
+  const text = (prefill || '') + raw;
   const ms = Date.now() - started;
 
   try {

@@ -25,6 +25,7 @@ ${JSON.stringify(digital, null, 2).slice(0, 3500)}
     system: CHECKLIST_PROMPT,
     user: context + priorFindings + '\n\nProduce the 50-item JSON array now. No preamble.',
     max_tokens: 20000,
+    prefill: '[',   // checklist output is a top-level array
   });
 
   // Basic shape validation — the UI depends on the fields being present.
