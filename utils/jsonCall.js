@@ -13,17 +13,20 @@ const Anthropic = require('@anthropic-ai/sdk');
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-async function callJson({ system, user, max_tokens = 1500, label = 'agent', isArray = false, itemSchema = null }) {
+async function callJson({ system, user, max_tokens = 1500, label = 'agent', isArray = false, itemSchema = null, schema = null }) {
   const started = Date.now();
 
-  const input_schema = isArray
-    ? {
-        type: 'object',
-        properties: { items: { type: 'array', items: itemSchema || {} } },
-        required: ['items'],
-        additionalProperties: false,
-      }
-    : { type: 'object', additionalProperties: true };
+  // Priority: caller-supplied schema > isArray wrapper > permissive default.
+  const input_schema = schema
+    ? schema
+    : isArray
+      ? {
+          type: 'object',
+          properties: { items: { type: 'array', items: itemSchema || {} } },
+          required: ['items'],
+          additionalProperties: false,
+        }
+      : { type: 'object', additionalProperties: true };
 
   let resp;
   try {
