@@ -1,0 +1,352 @@
+/* ==========================================================================
+   Nova UI Design System — Colors & Type (with Dark theme)
+   Source of truth: DS.fig (Page 1 — Color Palette, Typography)
+   ========================================================================== */
+
+/* Font: Open Sans (Google Fonts) is used throughout the system. */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&display=swap');
+
+:root {
+  /* ------------------------------------------------------------------
+     PRIMARY (navy, cool)
+     ------------------------------------------------------------------ */
+  --primary:       #070C27;   /* rgb(7,12,39)     — headings, primary actions */
+  --accent:        #4250B6;   /* rgb(66,80,182)   — focus rings, links, selection */
+  --primary-30:    #B1BCFF;   /* rgb(177,188,255) */
+  --primary-10:    #DADFFB;   /* rgb(218,223,251) */
+  --primary-5:     #F0F2FE;   /* rgb(240,242,254) */
+  --primary-3:     #F7F7FC;   /* rgb(247,247,252) */
+  --primary-2:     #F9F9FB;   /* rgb(249,249,251) */
+
+  /* ------------------------------------------------------------------
+     GREYS (cool blue-tinged)
+     ------------------------------------------------------------------ */
+  --grey-100:      #383943;   /* rgb(56,57,67)    — body text secondary */
+  --grey-80:       #4D5063;   /* rgb(77,80,99)    — icons, tertiary text */
+  --grey-50:       #66738D;   /* rgb(102,115,141) — placeholder, disabled fg */
+  --grey-40:       #7E858E;   /* rgb(126,133,142) */
+  --grey-30:       #75767F;   /* rgb(117,118,127) */
+  --grey-20:       #828698;   /* rgb(130,134,152) */
+  --grey-10:       #B5B6BE;   /* rgb(181,182,190) — disabled stroke */
+  --grey-5:        #D3D5DF;   /* rgb(211,213,223) — border default */
+  --grey-2:        #E6E7EB;   /* rgb(230,231,235) — row divider / subtle border */
+  --grey-1:        #F0F2F5;   /* rgb(240,242,245) — input bg, chip bg */
+  --grey-0:        #F8F8FA;   /* rgb(248,248,250) — table divider tint */
+
+  /* Text color from Figma specimens */
+  --ink:           #141732;   /* rgb(20,23,50)    — primary text on white */
+
+  /* Black / White / overlays */
+  --black:         #000000;
+  --white:         #FFFFFF;
+  --white-70:      rgba(255,255,255,0.7);
+  --bcgr-blur:     rgba(26,29,47,0.7);  /* dark scrim w/ backdrop-blur */
+
+  /* ------------------------------------------------------------------
+     SYSTEM (semantic)
+     ------------------------------------------------------------------ */
+  --system-green:  #00BA6C;   /* success */
+  --system-red:    #FF1B0D;   /* error, destructive */
+
+  /* ------------------------------------------------------------------
+     EXTRAS (brand accents used sparingly — logo chips, illustrations)
+     ------------------------------------------------------------------ */
+  --accent-green:     #6EBE7C;
+  --accent-orange:    #EFA56C;
+  --accent-yellow:    #F5B744;
+  --accent-yellow-dk: #E8932A;
+  --accent-yellow-lg: #FAD370;
+  --accent-blue:      #5BC8F3;
+  --accent-pink:      #ED70C0;
+  --accent-blueberry: #BF71DF;
+
+  /* ------------------------------------------------------------------
+     SEMANTIC TOKENS
+     ------------------------------------------------------------------ */
+  --fg:            var(--ink);
+  --fg-muted:      var(--grey-100);
+  --fg-subtle:     var(--grey-50);
+  --fg-disabled:   var(--grey-10);
+  --fg-on-dark:    var(--white);
+
+  --bg:            var(--white);
+  --bg-subtle:     var(--primary-2);
+  --bg-muted:      var(--grey-0);
+  --bg-input:      var(--grey-1);
+  --bg-overlay:    var(--bcgr-blur);
+
+  --border:        var(--grey-2);
+  --border-strong: var(--grey-5);
+  --border-focus:  var(--accent);
+
+  --success:       var(--system-green);
+  --danger:        var(--system-red);
+
+  /* Action fills (primary button, brand mark) — abstracted so dark can flip them */
+  --action-bg:         var(--primary);      /* navy in light */
+  --action-bg-hover:   #1B2149;              /* slightly lifted navy */
+  --action-fg:         var(--white);
+  --action-ghost-bg:   var(--primary-5);    /* tertiary/ghost hover tint */
+  --action-ghost-fg:   var(--primary);
+
+  /* Table / chrome tints (so dark can swap without nuking --grey-1 everywhere) */
+  --row-hover:     var(--primary-2);
+  --th-bg:         var(--grey-1);
+  --divider:       var(--grey-0);
+
+  /* Badge tints — kept transparent over bg so they read on both themes */
+  --badge-success-bg: rgba(0,186,108,0.12);
+  --badge-success-fg: #008C51;
+  --badge-danger-bg:  rgba(255,27,13,0.10);
+  --badge-danger-fg:  #B31309;
+  --badge-warn-bg:    rgba(245,183,68,0.18);
+  --badge-warn-fg:    #8A5A00;
+  --badge-info-bg:    var(--primary-5);
+  --badge-info-fg:    var(--accent);
+  --badge-muted-bg:   var(--grey-1);
+  --badge-muted-fg:   var(--grey-50);
+
+  /* Color-scheme tag so native form controls, scrollbars etc. match */
+  color-scheme: light;
+
+  /* ------------------------------------------------------------------
+     TYPOGRAPHY SCALE (from /Page-1/Typography)
+     Format: font-size | line-height | weight
+     ------------------------------------------------------------------ */
+  --font-sans: 'Open Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* Weights */
+  --w-light: 300;
+  --w-regular: 400;
+  --w-medium: 500;
+  --w-semibold: 600;
+  --w-bold: 700;
+
+  /* Headings — default weight is Light 300 (Figma "Light" rows) */
+  --h1-size: 32px;   --h1-lh: 40px;
+  --h2-size: 24px;   --h2-lh: 32px;
+  --h3-size: 20px;   --h3-lh: 32px;
+  --h4-size: 18px;   --h4-lh: 24px;
+  --h5-size: 16px;   --h5-lh: 24px;
+  --h6-size: 12px;   --h6-lh: 16px;
+
+  /* Paragraph */
+  --p-size: 14px;    --p-lh: 24px;
+
+  /* Product / micro */
+  --micro-size: 8px;   --micro-lh: 16px;   /* 0.04em tracking */
+  --mini-size:  10px;  --mini-lh: 16px;
+
+  /* Stats display */
+  --stats-s-size: 40px;  --stats-s-lh: 48px;  /* Light */
+  --stats-l-size: 48px;  --stats-l-lh: 56px;  /* Light */
+
+  /* Letter spacing (from Figma) */
+  --track-tight:  0.010em;   /* body, inputs */
+  --track-normal: 0.020em;   /* buttons, h6 uppercase, tooltips */
+  --track-wide:   0.040em;   /* micro caps */
+
+  /* ------------------------------------------------------------------
+     SPACING / RADII / SHADOWS
+     ------------------------------------------------------------------ */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  --radius-sm: 2px;    /* color swatches, chips */
+  --radius:    4px;    /* buttons, inputs, cells */
+  --radius-md: 5px;    /* cards, containers */
+  --radius-lg: 8px;    /* calendar year pill */
+  --radius-pill: 100px;
+
+  /* Shadows (elevation system, derived from Figma Shadows frame) */
+  --elev-1: 0 2px 4px rgba(180,183,199,0.25);
+  --elev-2: 0 4px 8px rgba(180,183,199,0.25), 0 1px 2px rgba(180,183,199,0.15);
+  --elev-3: 0 8px 24px rgba(180,183,199,0.30), 0 2px 4px rgba(180,183,199,0.15);
+  --elev-top-1: 0 -2px 8px rgba(180,183,199,0.25);
+}
+
+/* ==========================================================================
+   SEMANTIC TYPE CLASSES
+   ========================================================================== */
+html, body {
+  font-family: var(--font-sans);
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.h1, h1 { font: var(--w-light) var(--h1-size)/var(--h1-lh) var(--font-sans); color: var(--fg); margin: 0; }
+.h2, h2 { font: var(--w-light) var(--h2-size)/var(--h2-lh) var(--font-sans); color: var(--fg); margin: 0; }
+.h3, h3 { font: var(--w-light) var(--h3-size)/var(--h3-lh) var(--font-sans); color: var(--fg); margin: 0; }
+.h4, h4 { font: var(--w-light) var(--h4-size)/var(--h4-lh) var(--font-sans); color: var(--fg); margin: 0; }
+.h5, h5 { font: var(--w-regular) var(--h5-size)/var(--h5-lh) var(--font-sans); color: var(--fg); margin: 0; }
+.h6, h6 {
+  font: var(--w-bold) var(--h6-size)/var(--h6-lh) var(--font-sans);
+  letter-spacing: var(--track-normal);
+  color: var(--fg);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.p, p {
+  font: var(--w-regular) var(--p-size)/var(--p-lh) var(--font-sans);
+  color: var(--fg-muted);
+  margin: 0;
+}
+.p-light { font-weight: var(--w-light); }
+.p-medium { font-weight: var(--w-medium); }
+.p-semibold { font-weight: var(--w-semibold); letter-spacing: var(--track-tight); }
+
+.caps {
+  font: var(--w-medium) var(--p-size)/var(--p-lh) var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: var(--track-normal);
+}
+
+.micro {
+  font: var(--w-medium) var(--micro-size)/var(--micro-lh) var(--font-sans);
+  letter-spacing: var(--track-wide);
+  text-transform: uppercase;
+}
+
+.mini {
+  font: var(--w-regular) var(--mini-size)/var(--mini-lh) var(--font-sans);
+}
+
+.stat-s {
+  font: var(--w-light) var(--stats-s-size)/var(--stats-s-lh) var(--font-sans);
+  color: var(--fg);
+}
+
+.stat-l {
+  font: var(--w-light) var(--stats-l-size)/var(--stats-l-lh) var(--font-sans);
+  color: var(--fg);
+}
+
+.button-label {
+  font: var(--w-bold) 14px/24px var(--font-sans);
+  letter-spacing: var(--track-normal);
+}
+
+/* ==========================================================================
+   DARK THEME
+   Opt-in via <html data-theme="dark"> or <body data-theme="dark">.
+   Only re-maps the SEMANTIC token layer — the raw palette (navy, greys,
+   accents) is unchanged, which keeps illustrations/brand swatches faithful.
+   ========================================================================== */
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Dark surface ladder — navy-black with cool-blue tint, derived from --primary */
+  --bg-0:        #07091C;   /* deepest — app background */
+  --bg-1:        #0E1230;   /* default surface (page bg, modal bg) */
+  --bg-2:        #161A3D;   /* elevated surface (card, topbar, sidebar) */
+  --bg-3:        #1F2449;   /* raised / hover */
+  --bg-4:        #2A2F57;   /* active / pressed, input fill */
+
+  /* Semantic surfaces */
+  --bg:            var(--bg-1);
+  --bg-subtle:     var(--bg-2);
+  --bg-muted:      var(--bg-2);
+  --bg-input:      var(--bg-3);
+  --bg-overlay:    rgba(4, 6, 18, 0.72);   /* deeper scrim on dark */
+
+  /* Text — near-white with primary tint, matches Figma's dark-surface icon color #F7F8FF */
+  --ink:           #F7F8FF;
+  --fg:            #F7F8FF;
+  --fg-muted:      #C8CBDA;
+  --fg-subtle:     #8B93AD;
+  --fg-disabled:   #5A6080;
+  --fg-on-dark:    var(--white);
+
+  /* Borders — darker, still cool */
+  --border:        #262B52;
+  --border-strong: #3A4078;
+  --border-focus:  var(--primary-30);   /* indigo-300 reads on dark */
+
+  /* Accent — lift to primary-30 so links/focus stay visible on dark */
+  --accent:        #B1BCFF;
+
+  /* Action fills — flip to light-indigo with navy text (reads as "primary" on dark) */
+  --action-bg:         var(--primary-30);  /* #B1BCFF */
+  --action-bg-hover:   var(--primary-10);  /* #DADFFB */
+  --action-fg:         #070C27;            /* navy ink on light-indigo */
+  --action-ghost-bg:   rgba(177,188,255,0.14);
+  --action-ghost-fg:   var(--primary-30);
+
+  /* Chrome tints */
+  --row-hover:     var(--bg-3);
+  --th-bg:         var(--bg-3);
+  --divider:       rgba(255,255,255,0.06);
+
+  /* Semantic colors — brighten so they pop on dark */
+  --system-green:  #3DE298;
+  --system-red:    #FF5B51;
+  --success:       var(--system-green);
+  --danger:        var(--system-red);
+
+  /* Badge tints re-balanced for dark */
+  --badge-success-bg: rgba(61,226,152,0.14);
+  --badge-success-fg: #3DE298;
+  --badge-danger-bg:  rgba(255,91,81,0.14);
+  --badge-danger-fg:  #FF8A82;
+  --badge-warn-bg:    rgba(245,183,68,0.16);
+  --badge-warn-fg:    #FAD370;
+  --badge-info-bg:    rgba(177,188,255,0.14);
+  --badge-info-fg:    var(--primary-30);
+  --badge-muted-bg:   var(--bg-3);
+  --badge-muted-fg:   var(--fg-subtle);
+
+  /* Shadows — on dark, elevation is about contrast. Drop saturation, up opacity. */
+  --elev-1:     0 1px 2px rgba(0,0,0,0.50);
+  --elev-2:     0 4px 12px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.40);
+  --elev-3:     0 12px 32px rgba(0,0,0,0.65), 0 2px 6px rgba(0,0,0,0.35);
+  --elev-top-1: 0 -2px 8px rgba(0,0,0,0.45);
+
+  /* Overlay scrim (modal) */
+  --bcgr-blur:     rgba(4, 6, 18, 0.72);
+  --white-70:      rgba(247,248,255,0.06);  /* glass-panel on dark */
+
+  /* ------------------------------------------------------------------
+     RAW-PALETTE REMAPS
+     These remap selected raw tokens in dark so inline styles like
+     `color: var(--grey-50)` or `background: var(--white)` flip
+     automatically. Keeps existing JSX working without touching it.
+     We do NOT remap: --black, --ink (uses its own semantic path),
+     or the --accent-* brand illustration swatches.
+     ------------------------------------------------------------------ */
+  --primary:       var(--primary-30);        /* light-indigo stands in for "primary" on dark */
+  --primary-2:     var(--bg-2);
+  --primary-3:     var(--bg-2);
+  --primary-5:     var(--action-ghost-bg);
+  --grey-0:        var(--divider);
+  --grey-1:        var(--bg-input);
+  --grey-2:        var(--border);
+  --grey-5:        var(--border-strong);
+  --grey-10:       var(--fg-disabled);
+  --grey-20:       var(--fg-disabled);
+  --grey-30:       var(--fg-subtle);
+  --grey-40:       var(--fg-subtle);
+  --grey-50:       var(--fg-subtle);
+  --grey-80:       var(--fg-muted);
+  --grey-100:      var(--fg-muted);
+  --white:         var(--bg);                /* most uses are surface fills */
+}
+
+/* When the whole document is dark, paint the body surface so there's no
+   flash of light between components. */
+html[data-theme="dark"], html[data-theme="dark"] body,
+body[data-theme="dark"] {
+  background: var(--bg-0);
+  color: var(--fg);
+}

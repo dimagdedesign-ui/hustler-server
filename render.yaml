@@ -1,0 +1,28 @@
+# Render Infrastructure-as-Code.
+# Push this repo to GitHub, then in Render: "New → Blueprint" → pick the repo.
+# Render reads this file, provisions the service, and prompts for secret values.
+#
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: ai-business-analyst
+    runtime: node
+    plan: starter           # Free tier sleeps after 15m + has tighter timeouts;
+                            # "starter" ($7/mo) keeps the service warm and
+                            # handles the 45–90s pipeline without cold starts.
+    region: frankfurt       # Pick the region closest to your users.
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false         # Secret — Render will prompt on first deploy.
+      - key: PAGESPEED_API_KEY
+        sync: false         # Optional — raises PSI quota to 25k/day.
+      - key: MAKE_WEBHOOK_URL
+        sync: false         # Optional — email-capture webhook.
+      - key: ALLOWED_ORIGIN
+        sync: false         # Optional — lock CORS down in production.
+      - key: NODE_ENV
+        value: production

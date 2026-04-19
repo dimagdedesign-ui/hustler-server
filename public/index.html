@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<title>AI Business Analyst</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="extras.css">
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Components -->
+<script type="text/babel" src="topbar.jsx"></script>
+<script type="text/babel" src="intake.jsx"></script>
+<script type="text/babel" src="pipeline.jsx"></script>
+<script type="text/babel" src="report-shell.jsx"></script>
+<script type="text/babel" src="report-summary.jsx"></script>
+<script type="text/babel" src="report-competitors.jsx"></script>
+<script type="text/babel" src="report-digital.jsx"></script>
+<script type="text/babel" src="report-checklist.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+function App() {
+  const [theme, setTheme] = useState(() => {
+    try { return localStorage.getItem('aiba-theme') || 'light'; } catch { return 'light'; }
+  });
+  const [stage, setStage] = useState('intake');     // intake | run | report
+  const [url, setUrl] = useState('');
+  const [apiState, setApiState] = useState({ status: 'idle' });  // idle | pending | success | error
+  const [report, setReport] = useState(null);
+  const [activeSection, setActiveSection] = useState('summary');
+  const [showTweaks, setShowTweaks] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    try { localStorage.setItem('aiba-theme', theme); } catch {}
+  }, [theme]);
+
+  // Scroll-spy for the report nav
+  useEffect(() => {
+    if (stage !== 'report') return;
+    const container = document.querySelector('.report-main');
+    if (!container) return;
+    const onScroll = () => {
+      const sections = window.SECTIONS || [];
+      let active = sections[0]?.id;
+      for (const s of sections) {
+        const el = document.getElementById(s.id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= 120) active = s.id;
+      }
+      setActiveSection(active);
+    };
+    container.addEventListener('scroll', onScroll);
+    onScroll();
+    return () => container.removeEventListener('scroll', onScroll);
+  }, [stage, report]);
+
+  const handleSubmit = async ({ url, userType }) => {
+    setUrl(url);
+    setStage('run');
+    setApiState({ status: 'pending' });
+    setReport(null);
+
+    try {
+      const resp = await fetch('/api/analyse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, user_type: userType }),
+      });
+      const body = await resp.json().catch(() => ({}));
+      if (!resp.ok) {
+        setApiState({ status: 'error', error: body.error || `Server returned ${resp.status}` });
+        return;
+      }
+      if (!body.report) {
+        setApiState({ status: 'error', error: 'Response missing report payload.' });
+        return;
+      }
+      setApiState({ status: 'success', report: body.report });
+    } catch (err) {
+      setApiState({ status: 'error', error: err.message || 'Network error' });
+    }
+  };
+
+  const handleComplete = (rpt) => {
+    window.REPORT = rpt;  // expose globally so components can read it
+    setReport(rpt);
+    setStage('report');
+  };
+
+  const handleRestart = () => {
+    setStage('intake');
+    setApiState({ status: 'idle' });
+    setReport(null);
+    window.REPORT = null;
+  };
+
+  const jump = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleDownload = async () => {
+    if (!report) return;
+    setDownloading(true);
+    try {
+      const resp = await fetch('/api/analyse/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ report }),
+      });
+      if (!resp.ok) throw new Error('Export failed');
+      const blob = await resp.blob();
+      const a = document.createElement('a');
+      const filename = `${report.meta?.slug || 'report'}-audit-${report.meta?.date || 'latest'}.md`;
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err) {
+      alert('Could not download — ' + err.message);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  return (
+    <div className="app">
+      <Topbar
+        theme={theme} setTheme={setTheme}
+        showTweaks={showTweaks} setShowTweaks={setShowTweaks}
+        stage={stage} onRestart={handleRestart}
+        onDownload={handleDownload} downloading={downloading}
+      />
+
+      {stage === 'intake' && <Intake initialUrl={url} onSubmit={handleSubmit} />}
+
+      {stage === 'run' && (
+        <RunScreen
+          url={url}
+          apiState={apiState}
+          onComplete={handleComplete}
+          onRestart={handleRestart}
+        />
+      )}
+
+      {stage === 'report' && report && (
+        <div className="report-shell">
+          <ReportNav activeId={activeSection} onJump={jump} />
+          <div className="report-main" style={{ overflowY: 'auto', height: 'calc(100vh - 56px)' }}>
+            <ReportHead />
+            <div className="report-body">
+              <SummarySection />
+              <BMCSection />
+              <CompetitorsSection />
+              <DigitalSection />
+              <BrandSection />
+              <StrategySection />
+              <SwotSection />
+              <DocsSection />
+              <ChecklistSection />
+              <MethodSection />
+              <ClosingCTA />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tweaks panel — theme toggle + jump-to-stage for dev */}
+      <div className={`tweaks ${showTweaks ? 'open' : ''}`}>
+        <div className="tweaks-hd">
+          <span>Tweaks</span>
+          <button className="icon-btn" style={{ width: 28, height: 28 }} onClick={() => setShowTweaks(false)}>
+            <i className="ri-close-line"></i>
+          </button>
+        </div>
+        <div className="tweaks-bd">
+          <div className="tweak-row">
+            <span className="k">Theme</span>
+            <div style={{ display: 'flex', gap: 4 }}>
+              {['light', 'dark'].map(t => (
+                <button key={t} className={`btn btn-sm ${theme === t ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setTheme(t)}>{t}</button>
+              ))}
+            </div>
+          </div>
+          <div className="tweak-row">
+            <span className="k">Checklist done-state</span>
+            <button className="btn btn-sm btn-secondary" onClick={() => {
+              if (!report?.meta?.slug) return;
+              localStorage.removeItem(`aiba-done:${report.meta.slug}`);
+              window.location.reload();
+            }}>Clear</button>
+          </div>
+          <div className="tweak-row">
+            <span className="k">Status</span>
+            <span style={{ fontSize: 12, opacity: 0.7 }}>
+              {apiState.status === 'pending' && '⏳ Pipeline running'}
+              {apiState.status === 'success' && '✅ Report loaded'}
+              {apiState.status === 'error' && `❌ ${apiState.error}`}
+              {apiState.status === 'idle' && '—'}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
