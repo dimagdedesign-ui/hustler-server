@@ -159,7 +159,7 @@ function App() {
         <div className="report-shell">
           <ReportNav activeId={activeSection} onJump={jump} />
           <div className="report-main" style={{ overflowY: 'auto', height: 'calc(100vh - 56px)' }}>
-            <ReportHead />
+            <ReportHead onDownload={handleDownload} downloading={downloading} />
             <div className="report-body">
               <SummarySection />
               <BMCSection />

@@ -47,11 +47,13 @@ function ChecklistSection() {
   const quadClass = (q) => q === 'Do First' ? 'q-do' : q === 'Plan' ? 'q-plan' : q === 'Batch' ? 'q-batch' : 'q-dep';
 
   return (
-    <section id="checklist" className="rsec">
-      <div className="rsec-head">
-        <div className="rsec-index">09</div>
-        <h2>Action checklist · {total} ICE-scored moves</h2>
-      </div>
+    <section id="checklist" className="report-section">
+      <SectionEyebrow
+        num="09"
+        title={`Action checklist · ${total} ICE-scored moves`}
+        sub="ICE scores: Impact × Confidence × Ease. Start with Do First, schedule the Plan group, batch the long-tail. Done-state persists locally."
+        icon="ri-list-check-2"
+      />
 
       <div className="cl-progress">
         <svg viewBox="0 0 40 40" className="ring">

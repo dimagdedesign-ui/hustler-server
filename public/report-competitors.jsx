@@ -1,54 +1,66 @@
-/* Competitive landscape — 1D threat bar (not 2D) + 5 cards.
- * Per-competitor numerics that aren't measured are intentionally absent. */
+/* Competitors — design's .comp-row / .threat styling with our grounded JSON.
+ * Drops: 2D positioning matrix, SOV proxy, per-competitor DA/velocity/review
+ * counts (none of those are scraped or measured). Keeps: threat score,
+ * positioning sentence, key weakness. */
+
 function CompetitorsSection() {
   const r = window.REPORT;
   if (!r) return null;
   const list = r.competitor?.list || [];
-  const disclaimer = r.competitor?.disclaimer || 'Competitors suggested by AI — verify with your own research.';
+  const disclaimer = r.competitor?.disclaimer
+    || 'Competitors suggested by AI based on niche inference — verify against your own research before acting.';
 
-  const tierColor = (t) => t === 'high' ? 'var(--semantic-danger)' : t === 'medium' ? 'var(--semantic-warning)' : 'var(--semantic-success)';
+  const tierCls = (t) => t === 'high' ? 'badge-danger' : t === 'medium' ? 'badge-warn' : 'badge-success';
 
   return (
-    <section id="competitors" className="rsec">
-      <div className="rsec-head">
-        <div className="rsec-index">03</div>
-        <h2>Competitive landscape</h2>
-      </div>
+    <section id="competitors" className="report-section">
+      <SectionEyebrow
+        num="03"
+        title="Competitive landscape"
+        sub="5 suggested rivals with AI-estimated threat composite, positioning line, and a single observable weakness to exploit. Numeric per-competitor data (DA, ad spend, review counts) isn't scraped — it's intentionally omitted rather than fabricated."
+        icon="ri-crosshair-2-line"
+      />
 
-      <div className="comp-bars">
+      <div className="comp-list">
         {list.map((c, i) => (
-          <div key={i} className="comp-bar-row">
-            <div className="comp-bar-name">
-              <strong>{c.name}</strong>
-              <span className="comp-bar-domain">{c.domain}</span>
-            </div>
-            <div className="comp-bar-track">
-              <div className="comp-bar-fill" style={{ width: `${(c.threat || 0) * 10}%`, background: tierColor(c.threatTier) }} />
-            </div>
-            <div className="comp-bar-score">{Number(c.threat || 0).toFixed(1)} <span>/ 10</span></div>
-          </div>
-        ))}
-      </div>
-
-      <div className="comp-cards">
-        {list.map((c, i) => (
-          <div key={i} className="comp-card">
-            <div className="comp-card-head">
-              <div>
-                <div className="comp-card-name">{c.name}</div>
-                <div className="comp-card-domain">{c.domain}</div>
+          <div key={i} className="comp-row">
+            <div>
+              <div className="name">{c.name}</div>
+              <div className="domain">{c.domain}</div>
+              <div className="weakness">
+                <i className="ri-lightbulb-line" style={{ fontSize: 13, marginRight: 4, color: 'var(--badge-warn-fg)', verticalAlign: -1 }}></i>
+                Gap to exploit: {c.weakness}
               </div>
-              <span className={`comp-tier t-${c.threatTier}`}>{c.threatTier} threat</span>
+              <div style={{ marginTop: 8, font: '400 13px/1.5 var(--font-sans)', color: 'var(--fg-muted)' }}>
+                <strong style={{ color: 'var(--fg)' }}>Positioning:</strong> {c.positioning}
+              </div>
+              <div className="signals mt-2">
+                <span className={`badge ${tierCls(c.threatTier)}`}>
+                  <span className="dot"></span>{c.threatTier} threat
+                </span>
+              </div>
             </div>
-            <div className="comp-card-pos"><strong>Position:</strong> {c.positioning}</div>
-            <div className="comp-card-weak"><strong>Key weakness:</strong> {c.weakness}</div>
+            <div style={{ textAlign: 'center' }}>
+              <div className="threat-lbl">Threat</div>
+              <div className="threat">
+                {Number(c.threat || 0).toFixed(1)}
+                <span style={{ fontSize: 14, color: 'var(--fg-subtle)', letterSpacing: 0 }}>/10</span>
+              </div>
+            </div>
+            <div>
+              <a className="btn btn-sm btn-secondary" href={`https://${c.domain}`} target="_blank" rel="noreferrer noopener">
+                <i className="ri-external-link-line"></i>Visit
+              </a>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="rsec-note">
-        <i className="ri-information-line"></i>
-        <span>{disclaimer}</span>
+      <div className="card card-pad" style={{ marginTop: 16, background: 'var(--bg-subtle)' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+          <i className="ri-information-line" style={{ color: 'var(--fg-subtle)', fontSize: 16, marginTop: 2 }}></i>
+          <div style={{ font: '400 13px/1.5 var(--font-sans)', color: 'var(--fg-muted)' }}>{disclaimer}</div>
+        </div>
       </div>
     </section>
   );

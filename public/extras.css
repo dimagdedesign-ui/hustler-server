@@ -1,10 +1,12 @@
-/* extras.css — styles for the new dynamic-report components on top of app.css.
- * All custom class names introduced in the rewritten JSX live here. */
+/* extras.css — only styles NOT already in app.css.
+ * Intake, pipeline, tweaks panel, a few dynamic-data helpers for sections
+ * that have no 1:1 design equivalent (tech chips, keyword cards, brand voice). */
 
 /* ── Utility ─────────────────────────────────────────────────────────────── */
 .spin { animation: spin 1s linear infinite; display: inline-block; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* Generic chip — for tech stack, checklist meta etc. */
 .chip {
   display: inline-flex; align-items: center; gap: 6px;
   height: 24px; padding: 0 10px; border-radius: 100px;
@@ -23,8 +25,9 @@
 .eff-med  { background: var(--badge-warn-bg);    color: var(--badge-warn-fg); border-color: transparent; }
 .eff-high { background: var(--badge-danger-bg);  color: var(--badge-danger-fg); border-color: transparent; }
 
+/* Table variant — used by Maturity + Methodology. */
 .tbl {
-  width: 100%; border-collapse: collapse; margin: 12px 0 0;
+  width: 100%; border-collapse: collapse; margin: 8px 0 0;
   font: 400 13px/1.5 var(--font-sans);
 }
 .tbl th {
@@ -36,6 +39,14 @@
 .tbl td { padding: 12px 14px; border-bottom: 1px solid var(--divider); color: var(--fg-muted); vertical-align: top; }
 .tbl td strong { color: var(--fg); font-weight: 600; }
 .tbl tr:last-child td { border-bottom: 0; }
+.stage-pill {
+  display: inline-block; padding: 2px 8px; border-radius: 100px;
+  background: var(--action-bg); color: var(--action-fg);
+  font: 600 11px/1.4 var(--font-sans);
+}
+
+/* Make top-level report-body width a touch wider so BMC grid breathes. */
+.report-body { max-width: 1240px; margin: 0 auto; }
 
 /* ── Intake screen ───────────────────────────────────────────────────────── */
 .intake {
@@ -167,213 +178,35 @@
 .pipeline-error-card .title { font: 600 14px/1 var(--font-sans); color: var(--badge-danger-fg); display: flex; gap: 8px; align-items: center; }
 .pipeline-error-card .msg { font: 400 13px/1.4 var(--font-sans); color: var(--badge-danger-fg); }
 
-/* ── Report shell (inherits .report-shell, .report-nav, .report-main from app.css) ── */
-.report-body { max-width: 1040px; margin: 0 auto; padding: 24px 32px 96px; }
-
-/* ── Report head (dynamic) ─────────────────────────────────────────────── */
-.report-head {
-  padding: 32px 0 8px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 24px;
-}
-.rh-eyebrow { font: 600 11px/1 var(--font-sans); color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-.rh-title { font: 300 36px/1.1 var(--font-sans); color: var(--fg); letter-spacing: -0.02em; margin: 0 0 10px; }
-.rh-sub { font: 400 15px/1.55 var(--font-sans); color: var(--fg-muted); max-width: 70ch; margin: 0 0 16px; }
-.rh-meta { display: flex; flex-wrap: wrap; gap: 8px; }
-.rh-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  height: 28px; padding: 0 12px; border-radius: 100px;
-  background: var(--bg-subtle); border: 1px solid var(--border);
-  font: 500 12px/1 var(--font-sans); color: var(--fg-muted);
-}
-.rh-chip i { color: var(--fg-subtle); font-size: 14px; }
-
-/* ── Section wrappers ──────────────────────────────────────────────────── */
-.rsec { padding: 40px 0; border-top: 1px solid var(--border); }
+/* ── Rsec wrapper — alias to make migrated sections render nicely ─────── */
+.rsec { padding: 48px 0; border-top: 1px solid var(--border); }
 .rsec:first-of-type { border-top: 0; }
-.rsec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
-.rsec-index {
-  width: 28px; height: 28px; border-radius: 6px;
-  background: var(--action-ghost-bg); color: var(--action-ghost-fg);
-  font: 600 11px/1 var(--font-sans); display: grid; place-items: center;
-}
-.rsec-head h2 { font: 300 26px/1.1 var(--font-sans); color: var(--fg); letter-spacing: -0.015em; margin: 0; }
-.rsec-subhead {
-  font: 600 12px/1 var(--font-sans); color: var(--fg-subtle);
-  text-transform: uppercase; letter-spacing: 0.08em;
-  margin: 28px 0 10px;
-}
-.rsec-note {
-  display: flex; gap: 8px; align-items: flex-start;
-  padding: 10px 14px; background: var(--bg-subtle); border: 1px solid var(--border);
-  border-radius: 8px; font: 400 12px/1.5 var(--font-sans); color: var(--fg-muted);
-  margin-top: 16px;
-}
-.rsec-note i { color: var(--fg-subtle); }
 
-/* ── Executive summary bullets ─────────────────────────────────────────── */
-.exec-bullets { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
-.exec-bullet {
-  display: grid; grid-template-columns: 36px 1fr; gap: 14px;
-  padding: 14px 18px; background: var(--bg-subtle);
-  border: 1px solid var(--border); border-radius: 10px;
-}
-.exec-bullet .icon {
-  width: 28px; height: 28px; border-radius: 6px;
-  display: grid; place-items: center; font-size: 15px;
-}
-.exec-bullet.k-win    .icon { background: var(--badge-success-bg); color: var(--badge-success-fg); }
-.exec-bullet.k-risk   .icon { background: var(--badge-danger-bg);  color: var(--badge-danger-fg); }
-.exec-bullet.k-action .icon { background: var(--badge-info-bg);    color: var(--badge-info-fg); }
-.exec-bullet .tag {
-  font: 600 10px/1 var(--font-sans); color: var(--fg-subtle);
-  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;
-}
-.exec-bullet .text { font: 400 14px/1.5 var(--font-sans); color: var(--fg); }
+/* ── Digital score tiles — helper for our 4 top-level scores ─────────── */
+/* Most styling is from app.css .score-tile but we add 'disabled' state */
+.score-tile.disabled { opacity: 0.5; }
+.score-tile.disabled .score-bar .fill { width: 0 !important; }
 
-.maturity-card { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; }
-.maturity-card .rsec-subhead { margin-top: 0; }
-.stage-pill {
-  display: inline-block; padding: 2px 8px; border-radius: 100px;
-  background: var(--action-bg); color: var(--action-fg);
-  font: 600 11px/1.4 var(--font-sans);
-}
+/* ── E-E-A-T + GEO bar rows (smaller inline variant) ─────────────────── */
+/* app.css has .eeat-row already — we only tweak the note spacing */
 
-/* ── Lean Canvas grid ──────────────────────────────────────────────────── */
-.bmc-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-  margin-bottom: 8px;
-}
-.bmc-block {
-  padding: 14px 16px; background: var(--bg-subtle);
-  border: 1px solid var(--border); border-radius: 10px;
-  display: flex; flex-direction: column; gap: 8px;
-}
-.bmc-block.c-high   { border-left: 3px solid var(--semantic-success, #2EB96E); }
-.bmc-block.c-medium { border-left: 3px solid var(--semantic-warning, #D98F12); }
-.bmc-block.c-low    { border-left: 3px solid var(--semantic-danger,  #D93F3F); }
-.bmc-k { font: 600 11px/1 var(--font-sans); color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.06em; }
-.bmc-conf { font: 500 11px/1 var(--font-sans); color: var(--fg-muted); display: inline-flex; gap: 4px; align-items: center; }
-.bmc-t { font: 400 13px/1.5 var(--font-sans); color: var(--fg); }
-
-.econ-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
-}
-.econ-card {
-  padding: 16px 18px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px;
-}
-.econ-k { font: 600 11px/1 var(--font-sans); color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
-.econ-v { font: 300 22px/1.2 var(--font-sans); color: var(--fg); margin-bottom: 6px; letter-spacing: -0.01em; }
-.econ-note { font: 400 11px/1.4 var(--font-sans); color: var(--fg-subtle); }
-
-/* ── Competitors ───────────────────────────────────────────────────────── */
-.comp-bars { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
-.comp-bar-row {
-  display: grid; grid-template-columns: 220px 1fr 80px;
-  align-items: center; gap: 14px;
-  padding: 10px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 8px;
-}
-.comp-bar-name strong { display: block; font: 600 13px/1.2 var(--font-sans); color: var(--fg); }
-.comp-bar-domain { font: 400 11px/1.4 var(--font-sans); color: var(--fg-subtle); }
-.comp-bar-track { height: 10px; background: var(--bg); border-radius: 100px; overflow: hidden; }
-.comp-bar-fill { height: 100%; transition: width 400ms ease-out; }
-.comp-bar-score { font: 600 14px/1 var(--font-sans); color: var(--fg); text-align: right; }
-.comp-bar-score span { color: var(--fg-subtle); font-weight: 400; font-size: 11px; }
-
-.comp-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
-.comp-card {
-  padding: 16px 18px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px;
-  display: flex; flex-direction: column; gap: 10px;
-}
-.comp-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-.comp-card-name { font: 600 15px/1.2 var(--font-sans); color: var(--fg); }
-.comp-card-domain { font: 400 11px/1 var(--font-sans); color: var(--fg-subtle); margin-top: 2px; }
-.comp-tier {
-  display: inline-flex; height: 22px; padding: 0 8px; border-radius: 100px;
-  font: 600 10px/22px var(--font-sans); text-transform: uppercase; letter-spacing: 0.06em;
-  flex-shrink: 0;
-}
-.comp-tier.t-high   { background: var(--badge-danger-bg);  color: var(--badge-danger-fg); }
-.comp-tier.t-medium { background: var(--badge-warn-bg);    color: var(--badge-warn-fg); }
-.comp-tier.t-low    { background: var(--badge-success-bg); color: var(--badge-success-fg); }
-.comp-card-pos, .comp-card-weak { font: 400 13px/1.5 var(--font-sans); color: var(--fg-muted); }
-.comp-card-pos strong, .comp-card-weak strong { color: var(--fg); }
-
-/* ── Digital presence ──────────────────────────────────────────────────── */
-.scores-row {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px;
-}
-.score-card {
+/* ── Keyword cluster cards ─────────────────────────────────────────────── */
+.kw-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.kw-card {
   padding: 18px 20px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px;
-  display: flex; flex-direction: column; gap: 4px;
 }
-.score-card.disabled { opacity: 0.55; }
-.score-k { font: 600 11px/1 var(--font-sans); color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.06em; }
-.score-v { font: 300 40px/1 var(--font-sans); color: var(--fg); letter-spacing: -0.02em; }
-.score-l { font: 500 12px/1 var(--font-sans); color: var(--fg-muted); }
-
-.ps-totals {
-  display: flex; gap: 16px; margin-top: 12px;
-  font: 400 12px/1.5 var(--font-sans); color: var(--fg-muted);
-}
-.ps-totals strong { color: var(--fg); }
-
-.eeat-grid { display: flex; flex-direction: column; gap: 8px; }
-.eeat-row {
-  display: grid; grid-template-columns: 160px 1fr 70px 1.5fr; gap: 14px;
-  align-items: center; padding: 10px 14px; background: var(--bg-subtle);
-  border: 1px solid var(--border); border-radius: 8px;
-}
-.eeat-row .k { font: 600 13px/1 var(--font-sans); color: var(--fg); }
-.eeat-row .bar { height: 8px; background: var(--bg); border-radius: 100px; overflow: hidden; }
-.eeat-row .bar .fill { height: 100%; background: var(--action-bg); transition: width 400ms ease-out; }
-.eeat-row .v { font: 600 14px/1 var(--font-sans); color: var(--fg); text-align: right; }
-.eeat-row .v span { color: var(--fg-subtle); font-weight: 400; font-size: 11px; }
-.eeat-row .n { font: 400 12px/1.4 var(--font-sans); color: var(--fg-muted); }
-
-.kw-note { font: 400 12px/1.4 var(--font-sans); color: var(--fg-subtle); margin-bottom: 12px; }
-.kw-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.kw-card { padding: 14px 16px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; }
-.kw-lbl { font: 600 11px/1 var(--font-sans); color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.kw-lbl { font: 600 11px/1 var(--font-sans); color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
 .kw-card ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
-.kw-card li { font: 400 13px/1.4 var(--font-sans); color: var(--fg); padding-left: 12px; position: relative; }
-.kw-card li::before { content: ""; position: absolute; left: 0; top: 8px; width: 4px; height: 4px; border-radius: 100px; background: var(--action-ghost-fg); }
+.kw-card li { font: 400 13px/1.4 var(--font-sans); color: var(--fg); padding-left: 14px; position: relative; }
+.kw-card li::before { content: ""; position: absolute; left: 0; top: 7px; width: 5px; height: 5px; border-radius: 100px; background: var(--action-ghost-fg); }
+.kw-note { font: 400 12px/1.5 var(--font-sans); color: var(--fg-subtle); margin: -4px 0 12px; }
 
-.tech-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+/* ── Tech stack chips ──────────────────────────────────────────────────── */
+.tech-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .tech-chips .chip em { font-style: normal; color: var(--fg-subtle); font-weight: 400; margin-left: 4px; }
 
-/* ── Brand assessment ──────────────────────────────────────────────────── */
-.brand-grid {
-  display: grid; grid-template-columns: 220px 1fr; gap: 16px;
-  margin-bottom: 20px;
-}
-.brand-score-card {
-  padding: 20px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px;
-  text-align: center; display: flex; flex-direction: column; gap: 4px; justify-content: center;
-}
-.brand-k { font: 600 11px/1 var(--font-sans); color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.06em; }
-.brand-v { font: 300 56px/1 var(--font-sans); color: var(--fg); letter-spacing: -0.03em; }
-.brand-v span { color: var(--fg-subtle); font-size: 20px; font-weight: 400; }
-.brand-meta {
-  background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px;
-  padding: 12px 16px; display: flex; flex-direction: column;
-}
-.brand-meta .row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 8px 0; border-bottom: 1px solid var(--divider);
-  font: 400 13px/1.4 var(--font-sans); color: var(--fg-muted);
-}
-.brand-meta .row:last-child { border-bottom: 0; }
-.brand-meta .row strong { color: var(--fg); font-weight: 600; }
-
-.brand-presence { display: flex; flex-direction: column; gap: 6px; font: 400 13px/1.5 var(--font-sans); color: var(--fg-muted); margin-bottom: 16px; }
-.brand-presence strong { color: var(--fg); }
-
-.voice-card { padding: 20px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; }
-.voice-tone { font: 400 14px/1.5 var(--font-sans); color: var(--fg); margin-bottom: 18px; }
-.voice-tone strong { color: var(--fg-muted); }
-.voice-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+/* ── Brand voice do/don't ──────────────────────────────────────────────── */
+.voice-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px; }
 .voice-cols .lbl {
   font: 600 12px/1 var(--font-sans); text-transform: uppercase; letter-spacing: 0.06em;
   margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
@@ -384,16 +217,16 @@
 .voice-cols li { font: 400 13px/1.5 var(--font-sans); color: var(--fg-muted); padding-left: 14px; position: relative; }
 .voice-cols li::before { content: "·"; position: absolute; left: 0; top: 0; color: var(--fg-subtle); font-weight: 600; }
 
-/* ── 90-day plan ────────────────────────────────────────────────────────── */
-.phases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+/* ── 90-day phases ─────────────────────────────────────────────────────── */
+.phases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .phase-card { padding: 18px 20px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; }
 .phase-name { font: 600 13px/1 var(--font-sans); color: var(--fg); margin-bottom: 12px; }
 .phase-card ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
 .phase-card li { font: 400 13px/1.5 var(--font-sans); color: var(--fg-muted); padding-left: 14px; position: relative; }
 .phase-card li::before { content: "›"; position: absolute; left: 0; color: var(--action-ghost-fg); font-weight: 700; }
 
-/* ── SWOT ──────────────────────────────────────────────────────────────── */
-.swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* ── SWOT 2×2 ──────────────────────────────────────────────────────────── */
+.swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .swot-q { padding: 16px 18px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; }
 .swot-q.k-s { border-left: 3px solid var(--semantic-success, #2EB96E); }
 .swot-q.k-w { border-left: 3px solid var(--semantic-danger,  #D93F3F); }
@@ -404,7 +237,7 @@
 .swot-q li { font: 400 13px/1.5 var(--font-sans); color: var(--fg-muted); padding-left: 14px; position: relative; }
 .swot-q li::before { content: "•"; position: absolute; left: 0; color: var(--fg-subtle); }
 
-/* ── Strategy docs ─────────────────────────────────────────────────────── */
+/* ── Strategy docs accordion ───────────────────────────────────────────── */
 .docs-list { display: flex; flex-direction: column; gap: 6px; }
 .doc-row { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
 .doc-hd {
@@ -423,11 +256,42 @@
 .doc-bd ul { margin: 6px 0 12px; padding-left: 20px; }
 .doc-bd li { margin: 4px 0; }
 
-/* ── Checklist ─────────────────────────────────────────────────────────── */
+/* ── Brand presence + voice card wrapper ───────────────────────────────── */
+.brand-stats-row { display: grid; grid-template-columns: 220px 1fr; gap: 16px; margin-top: 8px; }
+.brand-score-card {
+  padding: 20px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px;
+  text-align: center; display: flex; flex-direction: column; gap: 4px; justify-content: center;
+}
+.brand-k { font: 600 11px/1 var(--font-sans); color: var(--fg-subtle); text-transform: uppercase; letter-spacing: 0.06em; }
+.brand-v { font: 300 56px/1 var(--font-sans); color: var(--fg); letter-spacing: -0.03em; }
+.brand-v span { color: var(--fg-subtle); font-size: 20px; font-weight: 400; }
+.brand-meta {
+  background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 16px; display: flex; flex-direction: column;
+}
+.brand-meta .row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid var(--divider);
+  font: 400 13px/1.4 var(--font-sans); color: var(--fg-muted);
+}
+.brand-meta .row:last-child { border-bottom: 0; }
+.brand-meta .row strong { color: var(--fg); font-weight: 600; }
+.brand-presence { display: flex; flex-direction: column; gap: 6px; font: 400 13px/1.5 var(--font-sans); color: var(--fg-muted); margin: 16px 0; }
+.brand-presence strong { color: var(--fg); }
+
+/* ── Closing CTA card ──────────────────────────────────────────────────── */
+.cta-card {
+  padding: 32px; background: var(--action-bg); color: var(--action-fg);
+  border-radius: 12px; text-align: center; margin-top: 24px;
+}
+.cta-card h3 { font: 300 24px/1.2 var(--font-sans); margin: 0 0 8px; color: var(--action-fg); letter-spacing: -0.015em; }
+.cta-card p { font: 400 14px/1.5 var(--font-sans); margin: 0; color: var(--action-fg); opacity: 0.85; }
+
+/* ── Checklist (keeps current UX — user prefers this filter) ─────────── */
 .cl-progress {
   display: flex; align-items: center; gap: 18px;
   padding: 18px 24px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 12px;
-  margin-bottom: 20px;
+  margin: 16px 0 20px;
 }
 .cl-progress .ring { width: 52px; height: 52px; transform: rotate(-90deg); }
 .cl-progress .ring .track { stroke: var(--bg); stroke-width: 4; fill: none; }
@@ -488,20 +352,11 @@
 .ci-steps li { font: 400 13px/1.5 var(--font-sans); color: var(--fg-muted); }
 .cl-empty { padding: 40px 20px; text-align: center; color: var(--fg-subtle); font: 400 14px/1.4 var(--font-sans); }
 
-/* ── Closing CTA ───────────────────────────────────────────────────────── */
-.closing-cta { border-top: 0; padding-top: 20px; }
-.cta-card {
-  padding: 32px; background: var(--action-bg); color: var(--action-fg);
-  border-radius: 12px; text-align: center;
-}
-.cta-card h3 { font: 300 24px/1.2 var(--font-sans); margin: 0 0 8px; color: var(--action-fg); letter-spacing: -0.015em; }
-.cta-card p { font: 400 14px/1.5 var(--font-sans); margin: 0; color: var(--action-fg); opacity: 0.85; }
-
-/* ── Tweaks panel (copied + simplified) ────────────────────────────────── */
+/* ── Tweaks panel ──────────────────────────────────────────────────────── */
 .tweaks {
   position: fixed; right: 16px; top: 72px; width: 280px;
   background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
-  box-shadow: var(--shadow-3, 0 12px 32px rgba(0,0,0,0.12));
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
   transform: translateX(320px); transition: transform 200ms ease-out;
   z-index: 50; overflow: hidden;
 }
@@ -511,16 +366,13 @@
 .tweak-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .tweak-row .k { font: 500 12px/1 var(--font-sans); color: var(--fg-muted); }
 
-/* ── Responsive tweaks ─────────────────────────────────────────────────── */
+/* ── Responsive ────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .bmc-grid { grid-template-columns: repeat(2, 1fr); }
-  .scores-row { grid-template-columns: repeat(2, 1fr); }
-  .kw-grid { grid-template-columns: 1fr; }
   .phases { grid-template-columns: 1fr; }
   .swot-grid { grid-template-columns: 1fr; }
+  .kw-grid { grid-template-columns: 1fr; }
+  .brand-stats-row { grid-template-columns: 1fr; }
+  .voice-cols { grid-template-columns: 1fr; }
   .agent-row { grid-template-columns: 36px 1fr 120px; }
   .agent-row .state { display: none; }
-  .comp-bar-row { grid-template-columns: 140px 1fr 60px; }
-  .brand-grid { grid-template-columns: 1fr; }
-  .voice-cols { grid-template-columns: 1fr; }
 }
