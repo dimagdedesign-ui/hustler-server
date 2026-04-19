@@ -24,7 +24,7 @@ ${JSON.stringify(digital, null, 2).slice(0, 3500)}
     label: 'AGENT:CL',
     system: CHECKLIST_PROMPT,
     user: context + priorFindings + '\n\nProduce the 50-item JSON array now. No preamble.',
-    max_tokens: 16000,
+    max_tokens: 20000,
   });
 
   // Basic shape validation — the UI depends on the fields being present.

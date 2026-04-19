@@ -92,10 +92,12 @@ const UNIVERSAL_RULES = `You are an AI business analyst producing a grounded aud
 
 const JSON_RULES = `OUTPUT FORMAT — STRICT JSON:
 
-- Your response MUST be a single valid JSON object. No markdown code fences. No preamble. No trailing prose.
-- Start with { and end with }. Nothing else.
+- Your response MUST be a single valid JSON value. No markdown code fences. No preamble. No trailing prose. No commentary of any kind.
+- The FIRST character of your response must be "{" or "[". The LAST character must be the matching "}" or "]". Nothing else before or after.
 - Use double-quoted strings. Escape internal quotes with \\".
 - Booleans unquoted. Nulls unquoted. Use null for genuinely missing values.
-- Match the schema EXACTLY — no extra keys, no missing keys.`;
+- Match the schema EXACTLY — no extra keys, no missing keys.
+- Never emit trailing commas. Never emit JavaScript comments (\`//\` or \`/* */\`).
+- If you find yourself running out of space, prioritise finishing the JSON over adding detail. A complete but terse JSON is better than a truncated rich one.`;
 
 module.exports = { buildContextBlock, UNIVERSAL_RULES, JSON_RULES };

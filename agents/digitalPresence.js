@@ -9,7 +9,7 @@ async function runDigitalPresenceAgent({ scrape, userType, pageSpeed }) {
     label: 'AGENT:DP',
     system: DIGITAL_PRESENCE_PROMPT,
     user: context + '\n\nProduce the Digital Presence JSON now.',
-    max_tokens: 3500,
+    max_tokens: 4500,
   });
   return json;
 }
