@@ -131,36 +131,60 @@ async function runPipeline({ url, userType, ip }) {
   return report;
 }
 
-// ── JSON endpoint ────────────────────────────────────────────────────────────
+function friendlyError(m) {
+  // Check specific error patterns before generic status codes.
+  return /credit|balance|quota/i.test(m)
+    ? 'Your Anthropic credit balance is too low. Top up at console.anthropic.com → Plans & Billing, then retry.'
+    : /scrap|reach|robots|ENOTFOUND|ETIMEDOUT/i.test(m)
+      ? `Could not scrape the provided URL — ${m}`
+      : /401|authentication/i.test(m)
+        ? 'Anthropic API key rejected (401). Check ANTHROPIC_API_KEY in Render env vars.'
+        : /429|rate.?limit/i.test(m)
+          ? 'Anthropic rate-limited. Wait a minute and retry.'
+          : /529|overload/i.test(m)
+            ? 'Anthropic is temporarily overloaded. Retry shortly.'
+            : /JSON|parse|Unterminated|Truncated/i.test(m)
+              ? `AI response did not parse — ${m}`
+              : /400|invalid.?request/i.test(m)
+                ? `Anthropic rejected the request: ${m}`
+                : `Pipeline error: ${m}`;
+}
+
+// ── JSON endpoint (streams whitespace heartbeat so Render's proxy doesn't 502) ──
 router.post('/', analyseLimiter, async (req, res) => {
   const { url: rawUrl, user_type: userType } = req.body || {};
   const v = validateUrl(rawUrl);
   if (!v.ok) return res.status(400).json({ error: v.error });
 
+  // Keep the socket alive while the pipeline runs — Render's proxy 502s if it
+  // sees no bytes for ~30-60s. JSON.parse ignores leading whitespace so the
+  // final payload still parses on the client.
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-store');
+  res.setHeader('X-Accel-Buffering', 'no');    // some proxies buffer otherwise
+  res.flushHeaders?.();
+
+  const beat = setInterval(() => {
+    try { res.write(' '); } catch { /* socket closed */ }
+  }, 10_000);
+
   try {
     const report = await runPipeline({ url: v.url, userType, ip: req.ip });
-    res.json({ ok: true, report });
+    clearInterval(beat);
+    res.end(JSON.stringify({ ok: true, report }));
   } catch (err) {
+    clearInterval(beat);
     console.error('[ANALYSE] ✗ Error:', err.message);
     console.error(err.stack);
     const m = err.message || 'Unknown error';
-    // Check specific error patterns before generic status codes.
-    const msg = /credit|balance|quota/i.test(m)
-      ? 'Your Anthropic credit balance is too low. Top up at console.anthropic.com → Plans & Billing, then retry.'
-      : /scrap|reach|robots|ENOTFOUND|ETIMEDOUT/i.test(m)
-        ? `Could not scrape the provided URL — ${m}`
-        : /401|authentication/i.test(m)
-          ? 'Anthropic API key rejected (401). Check ANTHROPIC_API_KEY in Render env vars.'
-          : /429|rate.?limit/i.test(m)
-            ? 'Anthropic rate-limited. Wait a minute and retry.'
-            : /529|overload/i.test(m)
-              ? 'Anthropic is temporarily overloaded. Retry shortly.'
-              : /JSON|parse|Unterminated|Truncated/i.test(m)
-                ? `AI response did not parse — ${m}`
-                : /400|invalid.?request/i.test(m)
-                  ? `Anthropic rejected the request: ${m}`
-                  : `Pipeline error: ${m}`;
-    res.status(500).json({ error: msg, detail: m, stack: err.stack?.split('\n').slice(0, 4).join('\n') });
+    // Response has already had headers flushed + whitespace written. Status
+    // line is already 200. We encode the failure in the body instead.
+    res.end(JSON.stringify({
+      ok: false,
+      error: friendlyError(m),
+      detail: m,
+      stack: err.stack?.split('\n').slice(0, 4).join('\n'),
+    }));
   }
 });
 

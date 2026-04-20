@@ -77,9 +77,23 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url, user_type: userType }),
       });
-      const body = await resp.json().catch(() => ({}));
+      // The server streams whitespace heartbeats to keep the socket alive,
+      // then writes the final JSON at the end. JSON.parse ignores leading
+      // whitespace so we just parse the whole text body.
+      const text = await resp.text();
+      let body = {};
+      try { body = JSON.parse(text); } catch {
+        setApiState({ status: 'error', error: `Server returned unparseable response (${text.length} bytes)` });
+        return;
+      }
+      // Status-line-based errors (4xx before pipeline starts — rate limit, validation)
       if (!resp.ok) {
         setApiState({ status: 'error', error: body.error || `Server returned ${resp.status}` });
+        return;
+      }
+      // Body-based errors (pipeline already started when heartbeat began)
+      if (body.ok === false) {
+        setApiState({ status: 'error', error: body.error || body.detail || 'Pipeline failed' });
         return;
       }
       if (!body.report) {
