@@ -71,26 +71,27 @@ ${JSON_RULES}`;
 
 const STRATEGY_PROMPT = `${UNIVERSAL_RULES}
 
-## Your Task — 90-Day Marketing Plan
+## Your Task — 30-Day Action Plan
 
-Structured plan across 3 months, plus 4 KPI targets.
+Structured plan broken into 3 tight phases that fit in one month, plus 4 KPI targets.
 
 ### Required JSON schema
 
 {
   "phases": [
-    { "name": "Month 1 — Foundation", "bullets": ["b1", "b2", "b3"] },
-    { "name": "Month 2 — Build",      "bullets": ["b1", "b2", "b3"] },
-    { "name": "Month 3 — Scale",      "bullets": ["b1", "b2", "b3"] }
+    { "name": "Week 1 — Foundations",      "bullets": ["b1", "b2", "b3"] },
+    { "name": "Weeks 2–3 — Build",          "bullets": ["b1", "b2", "b3"] },
+    { "name": "Week 4 — Ship & measure",    "bullets": ["b1", "b2", "b3"] }
   ],
   "kpis": [
-    { "name": "KPI name", "target": "Specific target statement, no invented absolute numbers unless baseline is given in snapshot." }
+    { "name": "KPI name", "target": "Specific 30-day target. Prefer directional (reach 80% alt-text coverage) over invented absolutes. No fabricated baselines." }
     // exactly 4 kpis
   ]
 }
 
 ### Rules
 - Bullets must each reference a specific snapshot signal.
+- Keep scope realistic for 30 days — "launch" a new vertical takes months, but "publish the landing page + 3 BOFU articles + wire the CTA" fits.
 - KPI targets: prefer directional ("double blog output", "reach 80% image alt coverage") over absolute figures, unless a baseline was scraped.
 
 ${JSON_RULES}`;

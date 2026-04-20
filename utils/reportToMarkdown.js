@@ -194,7 +194,7 @@ ${swotTable}
 
 ---
 
-## 7. 90-Day Plan
+## 7. 30-Day Plan
 
 ${strategyMd}
 

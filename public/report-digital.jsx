@@ -283,8 +283,8 @@ function StrategySection() {
     <section id="strategy" className="report-section">
       <SectionEyebrow
         num="06"
-        title="90-day plan"
-        sub="Three phases with concrete moves tied to the snapshot signals, plus four KPIs to track."
+        title="30-day plan"
+        sub="Three tight phases fitted into one month, with concrete moves tied to snapshot signals plus four KPIs to track."
         icon="ri-calendar-schedule-line"
       />
       <div className="phases">
@@ -352,7 +352,10 @@ function DocsSection() {
 
   const renderMd = (md) => {
     if (!md) return <em>Not generated.</em>;
-    const lines = md.split('\n');
+    // Some agents emit literal "\n" (backslash+n) inside JSON strings instead
+    // of real newlines. Normalise both before splitting.
+    const normalised = String(md).replace(/\\n/g, '\n');
+    const lines = normalised.split('\n');
     const out = [];
     let buf = [];
     const flushList = () => { if (buf.length) { out.push(<ul key={out.length}>{buf.map((x, i) => <li key={i}>{x}</li>)}</ul>); buf = []; } };

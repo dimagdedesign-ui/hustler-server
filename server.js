@@ -25,7 +25,9 @@ app.set('trust proxy', 1);
 
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: process.env.ALLOWED_ORIGIN || '*' }));
-app.use(express.json({ limit: '32kb' }));
+// Generous JSON body limit — the markdown-export endpoint POSTs the full
+// report payload (can reach ~200KB once checklist + docs are populated).
+app.use(express.json({ limit: '2mb' }));
 
 app.use(express.static(path.join(__dirname, 'public')));
 

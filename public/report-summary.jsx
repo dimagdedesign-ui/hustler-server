@@ -95,7 +95,7 @@ function SummarySection() {
       <SectionEyebrow
         num="01"
         title="Executive summary"
-        sub={`${bullets.length} findings with inline evidence. The last item is your highest-priority 90-day play.`}
+        sub={`${bullets.length} findings with inline evidence. The last item is your highest-priority 30-day play.`}
         icon="ri-file-list-3-line"
       />
 
@@ -184,12 +184,19 @@ function BMCSection() {
     );
   };
 
+  // Hide cards where the value is "Not detectable" / "—" — they add no signal.
+  const isDetected = (it) => {
+    if (!it) return false;
+    const v = String(it.value || '').toLowerCase().trim();
+    if (!v || v === '—' || v === 'not detectable' || v === 'none' || v === 'unknown') return false;
+    return true;
+  };
   const econCards = [
     { lbl: 'Average order value',   it: econ.aov },
     { lbl: 'Active SKUs',           it: econ.skus },
     { lbl: 'Review velocity',       it: econ.reviewVelocity },
     { lbl: 'Revenue tier estimate', it: econ.revenueTier },
-  ].filter(x => x.it);
+  ].filter(x => isDetected(x.it));
 
   return (
     <section id="bmc" className="report-section">

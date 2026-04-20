@@ -31,7 +31,7 @@ function RunScreen({ url, apiState, onComplete, onRestart }) {
       { at: 8,  text: 'Scrape + PageSpeed in flight' },
       { at: 25, text: 'Business Model · Competitor · Digital Presence running in parallel' },
       { at: 55, text: 'Checklist agent composing 50 ICE-scored moves' },
-      { at: 80, text: 'Assembler stitching executive summary · SWOT · 90-day plan' },
+      { at: 80, text: 'Assembler stitching executive summary · SWOT · 30-day plan' },
     ];
     const hit = markers.find(m => progress >= m.at && !log.some(l => l.text === m.text));
     if (hit) setLog(l => [...l, { t: Date.now(), kind: 'info', text: hit.text }]);
