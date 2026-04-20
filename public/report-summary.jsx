@@ -10,8 +10,7 @@ function SectionEyebrow({ num, title, sub, icon }) {
   return (
     <div className="report-section-hd">
       <div className="section-eyebrow">
-        <span className="num">{num}</span>
-        <i className={icon} style={{ fontSize: 14, marginLeft: -2 }}></i>
+        <i className={icon} style={{ fontSize: 14 }}></i>
         Section {num}
       </div>
       <h2 className="section-title">{title}</h2>

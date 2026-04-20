@@ -14,16 +14,16 @@ function Topbar({ theme, setTheme, showTweaks, setShowTweaks, stage, onRestart, 
       <div className="spacer" />
       {stage === 'report' && (
         <React.Fragment>
-          <button className="btn btn-sm btn-secondary" onClick={onRestart}>
+          <button type="button" className="btn btn-sm btn-secondary" onClick={onRestart}>
             <i className="ri-arrow-left-line"></i>New analysis
           </button>
-          <button className="btn btn-sm btn-primary" onClick={onDownload} disabled={downloading}>
+          <button type="button" className="btn btn-sm btn-primary" onClick={onDownload} disabled={downloading}>
             <i className={downloading ? 'ri-loader-4-line spin' : 'ri-download-2-line'}></i>
             {downloading ? 'Preparing…' : 'Download .md'}
           </button>
         </React.Fragment>
       )}
-      <button className="icon-btn" title="Tweaks" onClick={() => setShowTweaks(!showTweaks)}>
+      <button type="button" className="icon-btn" title="Tweaks" onClick={() => setShowTweaks(!showTweaks)}>
         <i className="ri-equalizer-2-line"></i>
       </button>
       <button

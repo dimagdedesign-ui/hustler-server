@@ -111,7 +111,8 @@ function App() {
   };
 
   const handleDownload = async () => {
-    if (!report) return;
+    console.log('[download] click', { hasReport: !!report, downloading });
+    if (!report) { alert('No report loaded yet.'); return; }
     setDownloading(true);
     try {
       const resp = await fetch('/api/analyse/export', {
@@ -119,7 +120,10 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ report }),
       });
-      if (!resp.ok) throw new Error('Export failed');
+      if (!resp.ok) {
+        const body = await resp.text().catch(() => '');
+        throw new Error(`Server returned ${resp.status} — ${body.slice(0, 200)}`);
+      }
       const blob = await resp.blob();
       const a = document.createElement('a');
       const filename = `${report.meta?.slug || 'report'}-audit-${report.meta?.date || 'latest'}.md`;
@@ -128,7 +132,10 @@ function App() {
       document.body.appendChild(a);
       a.click();
       a.remove();
+      URL.revokeObjectURL(a.href);
+      console.log('[download] ok', filename);
     } catch (err) {
+      console.error('[download] failed:', err);
       alert('Could not download — ' + err.message);
     } finally {
       setDownloading(false);

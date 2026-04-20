@@ -111,13 +111,24 @@ ${JSON.stringify(competitor).slice(0, 2500)}
 ${JSON.stringify(digital).slice(0, 3000)}
 `;
 
+  const SWOT_SCHEMA = {
+    type: 'object',
+    properties: {
+      strengths:     { type: 'array', items: { type: 'string' }, minItems: 3, maxItems: 4 },
+      weaknesses:    { type: 'array', items: { type: 'string' }, minItems: 3, maxItems: 4 },
+      opportunities: { type: 'array', items: { type: 'string' }, minItems: 3, maxItems: 4 },
+      threats:       { type: 'array', items: { type: 'string' }, minItems: 3, maxItems: 4 },
+    },
+    required: ['strengths', 'weaknesses', 'opportunities', 'threats'],
+  };
+
   console.log('[ASSEMBLER] Running sub-prompts in parallel…');
   const [executive, maturity, swot, strategy, docs] = await Promise.all([
-    callJson({ label: 'ASM:exec',     system: EXECUTIVE_PROMPT, user: context + priorFindingsBlock + '\n\nProduce the JSON.', max_tokens: 600 }),
-    callJson({ label: 'ASM:maturity', system: MATURITY_PROMPT,  user: context + priorFindingsBlock + '\n\nProduce the JSON.', max_tokens: 500 }),
-    callJson({ label: 'ASM:swot',     system: SWOT_PROMPT,      user: context + priorFindingsBlock + '\n\nProduce the JSON.', max_tokens: 700 }),
-    callJson({ label: 'ASM:strategy', system: STRATEGY_PROMPT,  user: context + priorFindingsBlock + '\n\nProduce the JSON.', max_tokens: 900 }),
-    callJson({ label: 'ASM:docs',     system: DOCS_PROMPT,      user: context + priorFindingsBlock + '\n\nProduce the JSON.', max_tokens: 3500 }),
+    callJson({ label: 'ASM:exec',     system: EXECUTIVE_PROMPT, user: context + priorFindingsBlock + '\n\nProduce the JSON.', max_tokens: 800 }),
+    callJson({ label: 'ASM:maturity', system: MATURITY_PROMPT,  user: context + priorFindingsBlock + '\n\nProduce the JSON.', max_tokens: 600 }),
+    callJson({ label: 'ASM:swot',     system: SWOT_PROMPT,      user: context + priorFindingsBlock + '\n\nProduce the JSON.', max_tokens: 1500, schema: SWOT_SCHEMA }),
+    callJson({ label: 'ASM:strategy', system: STRATEGY_PROMPT,  user: context + priorFindingsBlock + '\n\nProduce the JSON.', max_tokens: 1200 }),
+    callJson({ label: 'ASM:docs',     system: DOCS_PROMPT,      user: context + priorFindingsBlock + '\n\nProduce the JSON.', max_tokens: 4000 }),
   ]);
 
   // Top-level digital scores.
