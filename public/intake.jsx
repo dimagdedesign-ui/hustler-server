@@ -62,15 +62,16 @@ function Intake({ initialUrl, onSubmit }) {
 
       <div className="intake-pipeline">
         <div className="intake-pipe-head">Five agents run on your URL</div>
-        <div className="intake-pipe-grid">
-          {AGENTS.map(a => (
-            <div key={a.key} className="intake-pipe-card">
-              <div className="ico"><i className={a.icon}></i></div>
-              <div>
-                <div className="n">{a.label}</div>
-                <div className="d">{a.desc}</div>
-              </div>
-            </div>
+        <div className="feature-grid">
+          {AGENTS.map((a, i) => (
+            <article key={a.key} className="feature-card">
+              <div className="feature-num">{String(i + 1).padStart(2, '0')}</div>
+              <h3 className="feature-title">
+                <i className={a.icon} aria-hidden="true"></i>
+                {a.label}
+              </h3>
+              <p className="feature-desc">{a.desc}</p>
+            </article>
           ))}
         </div>
         <div className="intake-note">
