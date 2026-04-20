@@ -91,8 +91,19 @@ function ChecklistSection() {
             const isDone = !!done[it.id];
             return (
               <div key={it.id} className={`check-item ${isDone ? 'checked' : ''}`}>
-                <div className="ci-hd">
-                  <input type="checkbox" checked={isDone} onChange={() => toggle(it.id)} />
+                <button
+                  className="ci-hd-btn ci-hd"
+                  onClick={() => toggleExpand(it.id)}
+                  aria-expanded={isOpen}
+                  aria-label={isOpen ? 'Collapse action details' : 'Expand action details'}
+                >
+                  {/* Stop-propagation on the checkbox so clicking it only toggles done-state */}
+                  <input
+                    type="checkbox"
+                    checked={isDone}
+                    onChange={(e) => { e.stopPropagation(); toggle(it.id); }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
                   <div className="ci-title">
                     <div className="title">{it.title}</div>
                     <div className="ci-meta">
@@ -102,10 +113,10 @@ function ChecklistSection() {
                       <span className="chip chip-ghost">I {it.impact} · C {it.confidence} · E {it.ease}</span>
                     </div>
                   </div>
-                  <button className="icon-btn" onClick={() => toggleExpand(it.id)} aria-label="Expand">
+                  <span className="icon-btn" aria-hidden="true">
                     <i className={isOpen ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'}></i>
-                  </button>
-                </div>
+                  </span>
+                </button>
                 {isOpen ? (
                   <div className="ci-bd">
                     <div className="ci-why"><strong>Why it matters:</strong> {it.why}</div>

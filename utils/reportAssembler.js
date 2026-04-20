@@ -19,11 +19,33 @@ function todayISO() {
 }
 
 function extractBusinessName(scrape) {
-  if (scrape.ogSiteName) return scrape.ogSiteName;
-  const title = (scrape.ogTitle || scrape.title || '').split('|')[0].split('—')[0].split('-')[0].trim();
-  if (title) return title;
-  if (scrape.h1Tags && scrape.h1Tags.length) return scrape.h1Tags[0];
-  try { return new URL(scrape.url).hostname.replace(/^www\./, ''); } catch { return 'Business'; }
+  // 1. og:site_name is the most reliable brand signal when present.
+  if (scrape.ogSiteName) return scrape.ogSiteName.trim();
+
+  // 2. Derive from hostname — e.g. "krootl.com" → "Krootl". This is more
+  //    reliable than title splitting for sites that put marketing copy in
+  //    the <title> ("Web & Mobile App development — Krootl").
+  let hostWord = '';
+  try {
+    const host = new URL(scrape.url).hostname.replace(/^www\./, '');
+    hostWord = host.split('.').slice(0, -1).join('.') || host.split('.')[0];
+    hostWord = hostWord.split(/[-_]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+  } catch {}
+
+  // 3. Try title splitting — if the title contains the hostname word,
+  //    extract the chunk that matches; otherwise fall back to hostname.
+  const title = (scrape.ogTitle || scrape.title || '').trim();
+  if (title && hostWord) {
+    const parts = title.split(/\s*[|—–-]\s*/).map(s => s.trim()).filter(Boolean);
+    const brand = parts.find(p => p.toLowerCase().includes(hostWord.toLowerCase().split(' ')[0]));
+    if (brand) return brand;
+  }
+  if (hostWord) return hostWord;
+
+  // 4. Last-resort fallbacks.
+  if (title) return title.split(/\s*[|—–-]\s*/)[0].trim();
+  if (scrape.h1Tags?.length) return scrape.h1Tags[0];
+  return 'Business';
 }
 
 function scoreLabel(score, thresholds = { ok: 70, warn: 40 }) {

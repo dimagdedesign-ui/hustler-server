@@ -2,14 +2,19 @@
  * Brand, Strategy, SWOT, Strategy docs, Methodology, Closing CTA.
  * Uses design's .score-tile / .cwv-table / .eeat-row / .card patterns. */
 
-function scoreTile(lbl, score, icon) {
+function scoreTile(lbl, score, icon, sublbl, tip) {
   if (score == null) {
     return (
       <div className="score-tile disabled">
-        <div className="lbl"><span><i className={icon} style={{ marginRight: 6 }}></i>{lbl}</span></div>
+        <div className="lbl">
+          <span className={tip ? 'tip' : ''} data-tip={tip || undefined}>
+            <i className={icon} style={{ marginRight: 6 }}></i>{lbl}
+          </span>
+        </div>
         <div className="val">—<span className="denom"> /100</span></div>
         <div className="score-bar"><div className="fill" style={{ width: 0 }} /></div>
         <div className="caption"><span className="badge badge-muted" style={{ padding: '1px 8px' }}>Not measured</span></div>
+        {sublbl ? <div className="sublbl">{sublbl}</div> : null}
       </div>
     );
   }
@@ -18,10 +23,15 @@ function scoreTile(lbl, score, icon) {
   const capCls = score < 40 ? 'badge-danger' : score < 60 ? 'badge-warn' : score < 80 ? 'badge-info' : 'badge-success';
   return (
     <div className={`score-tile ${kind}`}>
-      <div className="lbl"><span><i className={icon} style={{ marginRight: 6 }}></i>{lbl}</span></div>
+      <div className="lbl">
+        <span className={tip ? 'tip' : ''} data-tip={tip || undefined}>
+          <i className={icon} style={{ marginRight: 6 }}></i>{lbl}
+        </span>
+      </div>
       <div className="val">{score}<span className="denom"> /100</span></div>
       <div className="score-bar"><div className="fill" style={{ width: score + '%' }} /></div>
       <div className="caption"><span className={`badge ${capCls}`} style={{ padding: '1px 8px' }}>{label}</span></div>
+      {sublbl ? <div className="sublbl">{sublbl}</div> : null}
     </div>
   );
 }
@@ -38,6 +48,14 @@ function DigitalSection() {
   const tech = window.asArr(r.scrape?.techStack).slice(0, 16);
 
   const cwvFailing = ps?.cwv ? ps.cwv.filter(x => !x.pass).length : null;
+  const CWV_TIPS = {
+    LCP:  'Largest Contentful Paint — time for the biggest visible element (usually hero image or headline) to render. Google ranks pages worse when LCP > 2.5s on mobile.',
+    FCP:  'First Contentful Paint — time until anything meaningful appears on the screen. Controls perceived-speed on first load.',
+    TBT:  'Total Blocking Time — time the browser main thread was frozen by scripts during load. High TBT kills interactivity on low-end phones.',
+    CLS:  'Cumulative Layout Shift — how much visible elements jump during load (e.g. images without reserved height). Anything > 0.1 feels janky and hurts rankings.',
+    INP:  'Interaction to Next Paint — latency from a click/tap to the next screen update. Replaces FID as Google\'s 2024+ interactivity metric.',
+    TTFB: 'Time to First Byte — server response time from request to first byte of HTML. Dominated by hosting, CDN, and backend latency.',
+  };
 
   return (
     <section id="digital" className="report-section">
@@ -49,10 +67,18 @@ function DigitalSection() {
       />
 
       <div className="grid-4 mb-4">
-        {scoreTile('SEO',           top.seo?.score,  'ri-search-eye-line')}
-        {scoreTile('GEO readiness', top.geo?.score,  'ri-sparkling-2-line')}
-        {scoreTile('Performance',   top.perf?.score, 'ri-speed-up-line')}
-        {scoreTile('Tech stack',    top.tech?.score, 'ri-stack-line')}
+        {scoreTile('SEO', top.seo?.score, 'ri-search-eye-line',
+          'On-page SEO checks',
+          'Pass rate of on-page SEO basics: meta title length, description length, canonical tag, language, viewport for mobile, image alt coverage, H1 structure, HTTPS, Open Graph tags, and JSON-LD structured data.')}
+        {scoreTile('GEO readiness', top.geo?.score, 'ri-sparkling-2-line',
+          'AI-engine citability',
+          'GEO (Generative Engine Optimisation) — how ready your site is to be cited by AI engines like ChatGPT, Perplexity, and Google AI Overviews. Composite of schema markup, E-E-A-T signals, content depth, quotable statements, and author entity markup.')}
+        {scoreTile('Performance', top.perf?.score, 'ri-speed-up-line',
+          'Google Lighthouse mobile',
+          'Lighthouse Performance score (0–100) measured live via Google PageSpeed Insights on a simulated mobile network. Weighted mix of LCP, FCP, TBT, CLS, INP, TTFB and other loading metrics.')}
+        {scoreTile('Tech stack', top.tech?.score, 'ri-stack-line',
+          'Detected tooling maturity',
+          'How complete the digital stack is: Analytics, E-commerce, Email, SEO, CDN, Reviews, Payments, etc. detected via page scripts and meta tags. Score = coverage of expected categories × tool diversity.')}
       </div>
 
       {/* Core Web Vitals */}
@@ -81,7 +107,11 @@ function DigitalSection() {
                   <div className={`cell status ${c.pass ? 'pass' : 'fail'} ${last ? 'row-end' : ''}`}>
                     <i className={c.pass ? 'ri-checkbox-circle-fill' : 'ri-close-circle-fill'}></i>
                   </div>
-                  <div className={`cell ${last ? 'row-end' : ''}`} style={{ fontWeight: 600 }}>{c.k}</div>
+                  <div className={`cell ${last ? 'row-end' : ''}`} style={{ fontWeight: 600 }}>
+                    {CWV_TIPS[c.k] ? (
+                      <span className="tip" data-tip={CWV_TIPS[c.k]}>{c.k}</span>
+                    ) : c.k}
+                  </div>
                   <div className={`cell value ${last ? 'row-end' : ''}`} style={{ color: c.pass ? 'var(--success)' : 'var(--danger)' }}>
                     {c.value}
                   </div>
@@ -402,12 +432,49 @@ function MethodSection() {
   );
 }
 
-function ClosingCTA() {
+function ClosingCTA({ onDownload, downloading }) {
+  const r = window.REPORT;
+  const name = r?.meta?.businessName || 'Your business';
   return (
     <section className="report-section" style={{ borderTop: 0, paddingTop: 16 }}>
-      <div className="cta-card">
-        <h3>Ready to ship this plan?</h3>
-        <p>Every item in your checklist is a concrete move. Start with Do First, batch the rest. Share this report with your team.</p>
+      <div className="closing-cta">
+        <span className="eyebrow">Next step</span>
+        <h2>Your plan is ready — now ship the top 10.</h2>
+        <p className="lede">
+          Download the full report as .md, hand it to your team, and work the Do First quadrant in the next two weeks. Re-run the analysis in 30 days to measure lift.
+        </p>
+        <button className="cta-btn" onClick={onDownload} disabled={downloading}>
+          <i className={downloading ? 'ri-loader-4-line spin' : 'ri-download-2-line'}></i>
+          {downloading ? 'Preparing…' : 'Download full report (.md)'}
+        </button>
+        <div className="perks">
+          <span><i className="ri-markdown-line"></i>Markdown · copy into Notion/Docs</span>
+          <span><i className="ri-folder-3-line"></i>5 strategy docs included</span>
+          <span><i className="ri-refresh-line"></i>Re-run free within 30 days</span>
+        </div>
+      </div>
+
+      <div className="closing-cta" style={{ marginTop: 24, background: 'var(--bg-subtle)', color: 'var(--fg)', border: '1px solid var(--border)' }}>
+        <span className="eyebrow" style={{ color: 'var(--fg-subtle)', opacity: 1 }}>Need a team to ship it?</span>
+        <h2 style={{ color: 'var(--fg)' }}>Hand {name}'s audit to Cinnaboner and get it shipped.</h2>
+        <p className="lede" style={{ color: 'var(--fg-muted)', opacity: 1 }}>
+          Cinnaboner is a senior-only digital production team that takes businesses from strategy to live, revenue-generating brand. Bring this audit — we'll turn the Do-First quadrant into shipped work within 4 weeks.
+        </p>
+        <a
+          className="cta-btn"
+          href="https://cinnaboner.com/"
+          target="_blank"
+          rel="noreferrer noopener"
+          style={{ background: 'var(--action-bg)', color: 'var(--action-fg)' }}
+        >
+          <i className="ri-flashlight-line"></i>Book a free strategy call
+          <i className="ri-arrow-right-up-line" style={{ marginLeft: 4 }}></i>
+        </a>
+        <div className="perks" style={{ opacity: 1, color: 'var(--fg-subtle)' }}>
+          <span><i className="ri-trophy-line"></i>Senior designers + engineers only</span>
+          <span><i className="ri-rocket-2-line"></i>Ship the Do First quadrant in 4 weeks</span>
+          <span><i className="ri-shield-star-line"></i>Cinnaboner-backed results</span>
+        </div>
       </div>
     </section>
   );

@@ -55,12 +55,11 @@ function ReportHead({ onDownload, downloading }) {
         <span><i className="ri-time-line" style={{ fontSize: 13, marginRight: 4, verticalAlign: -1 }}></i>{(m.processingMs / 1000).toFixed(1)}s</span>
       </div>
 
-      <h1>Business analysis —<br/>{m.businessName}</h1>
+      <h1>Business analysis:<br/>{m.businessName}</h1>
 
       {m.tagline ? (
-        <p className="biz-line">
+        <p className="biz-line" style={{ marginTop: 4 }}>
           <strong>{m.tagline}</strong>
-          {m.userType && m.userType !== 'unknown' ? <> · {m.userType.replace('_', ' ')}</> : null}
         </p>
       ) : null}
 
@@ -76,9 +75,6 @@ function ReportHead({ onDownload, downloading }) {
         <button className="btn btn-primary" onClick={onDownload} disabled={downloading}>
           <i className={downloading ? 'ri-loader-4-line spin' : 'ri-download-2-line'}></i>
           {downloading ? 'Preparing…' : 'Download .md'}
-        </button>
-        <button className="btn btn-secondary" onClick={() => window.print()}>
-          <i className="ri-file-pdf-2-line"></i>Export PDF
         </button>
         <button className="btn btn-secondary" onClick={() => { navigator.clipboard?.writeText(window.location.href); }}>
           <i className="ri-share-forward-line"></i>Share
