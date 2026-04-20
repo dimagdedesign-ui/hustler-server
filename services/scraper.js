@@ -155,6 +155,102 @@ function countSkus($, url) {
   return productHrefs.size;
 }
 
+// ── Case studies / portfolio density — service-business signal ──────────────
+function countCaseStudies($, url) {
+  let origin;
+  try { origin = new URL(url).origin; } catch { origin = ''; }
+
+  const hrefs = new Set();
+  const patterns = [
+    /\/case-stud(?:y|ies)\/[a-z0-9-]+/i,
+    /\/work\/[a-z0-9-]+/i,
+    /\/projects?\/[a-z0-9-]+/i,
+    /\/portfolio\/[a-z0-9-]+/i,
+    /\/cases?\/[a-z0-9-]+/i,
+    /\/clients?\/[a-z0-9-]+/i,
+    /\/stor(?:y|ies)\/[a-z0-9-]+/i,   // e.g. customer-stories/acme
+    /\/customer-stor(?:y|ies)\/[a-z0-9-]+/i,
+  ];
+
+  $('a[href]').each((_, el) => {
+    let href = $(el).attr('href') || '';
+    if (!href) return;
+    if (href.startsWith('/')) href = origin + href;
+    if (patterns.some(p => p.test(href))) {
+      hrefs.add(href.split(/[?#]/)[0]);
+    }
+  });
+
+  // Fallback heuristic — if no direct matches, count anchors whose *text*
+  // looks like a case-study link ("read case study", "view project").
+  if (hrefs.size === 0) {
+    $('a[href]').each((_, el) => {
+      const text = ($(el).text() || '').trim().toLowerCase();
+      if (/^(read (the )?case|view project|case study|see project|view work|read more)/.test(text)) {
+        hrefs.add(($(el).attr('href') || '').split(/[?#]/)[0]);
+      }
+    });
+  }
+  return hrefs.size;
+}
+
+// ── Service lines — heuristic extraction from nav / headings / body ────────
+function extractServiceLines($) {
+  const lines = new Set();
+  const SERVICE_WORDS = /(development|design|consulting|strategy|marketing|engineering|software|mobile|web|app development|apps?|ux|ui|branding|seo|analytics|data science|ai\b|ml\b|machine learning|cloud|devops|security|training|workshop|research|flutter|react|node|python|wordpress|shopify|e-commerce|ecommerce|saas|integration|migration|audit)/i;
+  const SKIP = /^(home|about|contact|blog|careers|jobs|press|privacy|terms|login|sign[\s-]?up|faq|news|work|projects|portfolio|case stud(y|ies)|clients|services|company|team|resources|learn)$/i;
+  const QUESTION = /\?|^(is|are|can|how|what|why|should|does|do|will|which|when|where)\b/i;
+
+  // 1) Nav, header, menu links.
+  $('nav a, header a, [class*="menu"] a, [class*="nav"] a, [role="navigation"] a').each((_, el) => {
+    const text = $(el).text().trim();
+    if (text.length > 2 && text.length < 50 && SERVICE_WORDS.test(text) && !SKIP.test(text) && !QUESTION.test(text)) {
+      lines.add(text.replace(/\s+/g, ' '));
+    }
+  });
+
+  // 2) H2/H3 headings anywhere — often used as "What we do" section cards.
+  $('h2, h3').each((_, el) => {
+    const text = $(el).text().trim();
+    if (text.length > 2 && text.length < 60 && SERVICE_WORDS.test(text) && !SKIP.test(text) && !QUESTION.test(text)) {
+      lines.add(text.replace(/\s+/g, ' '));
+    }
+  });
+
+  // 3) Any anchor anywhere (dedupe catches overlaps with step 1).
+  $('a[href]').each((_, el) => {
+    const text = $(el).text().trim();
+    if (text.length > 2 && text.length < 50 && SERVICE_WORDS.test(text) && !SKIP.test(text) && !QUESTION.test(text)) {
+      lines.add(text.replace(/\s+/g, ' '));
+    }
+  });
+
+  return [...lines].slice(0, 10);
+}
+
+// ── Directory / credibility badges — service-business backlink-equivalents ──
+function detectDirectoryBadges($) {
+  const html = $.html().toLowerCase();
+  const directories = [];
+  const candidates = [
+    { name: 'Clutch',      pattern: /clutch\.co/i },
+    { name: 'G2',          pattern: /g2\.com|g2crowd\.com/i },
+    { name: 'DesignRush',  pattern: /designrush\.com/i },
+    { name: 'Trustpilot',  pattern: /trustpilot\.com/i },
+    { name: 'Capterra',    pattern: /capterra\.com/i },
+    { name: 'GoodFirms',   pattern: /goodfirms\.co/i },
+    { name: 'ProductHunt', pattern: /producthunt\.com/i },
+    { name: 'Awwwards',    pattern: /awwwards\.com/i },
+    { name: 'Crunchbase',  pattern: /crunchbase\.com/i },
+    { name: 'Gartner',     pattern: /gartner\.com/i },
+    { name: 'LinkedIn company', pattern: /linkedin\.com\/company\//i },
+  ];
+  for (const c of candidates) {
+    if (c.pattern.test(html)) directories.push(c.name);
+  }
+  return directories;
+}
+
 // ── Blog velocity — probe /blog for pubDate + post count ─────────────────────
 async function probeBlogVelocity(url) {
   let origin;
@@ -353,6 +449,11 @@ async function scrapeWebsite(url) {
   // ── SKU count (product links) ──
   const skuCount = countSkus($, url);
 
+  // ── Service-business signals ──
+  const caseStudyCount = countCaseStudies($, url);
+  const serviceLines = extractServiceLines($);
+  const directoryBadges = detectDirectoryBadges($);
+
   // ── Blog velocity (async probe) ──
   const blogVelocity = await probeBlogVelocity(url);
 
@@ -381,6 +482,9 @@ async function scrapeWebsite(url) {
     schemaTypes,
     aggregateRating,
     skuCount,
+    caseStudyCount,
+    serviceLines,
+    directoryBadges,
     blogVelocity,
   };
 }

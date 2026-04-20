@@ -19,16 +19,34 @@ function reportToMarkdown(r) {
     (r.businessModel?.canvas || []).map(c => [c.key, confIcon(c.conf), c.text])
   );
 
+  // Unit-econ table is user-type-aware: service businesses get service-lines /
+  // case studies / blog cadence / directory presence (all scraped directly);
+  // manufacturers get AOV / SKUs / price / revenue tier.
   const unitEcon = r.businessModel?.unitEcon || {};
-  const econTable = mdTable(
-    ['Metric', 'Value', 'Confidence', 'Note'],
-    [
-      ['AOV',             unitEcon.aov?.value || '—',            confIcon(unitEcon.aov?.conf),            unitEcon.aov?.note || ''],
-      ['Price Range',     unitEcon.priceRange?.value || '—',     confIcon(unitEcon.priceRange?.conf),     unitEcon.priceRange?.note || ''],
-      ['Revenue Tier',    unitEcon.revenueTier?.value || '—',    confIcon(unitEcon.revenueTier?.conf),    unitEcon.revenueTier?.note || ''],
-      ['Review Velocity', unitEcon.reviewVelocity?.value || '—', confIcon(unitEcon.reviewVelocity?.conf), unitEcon.reviewVelocity?.note || ''],
-    ]
-  );
+  const sc = r.scrape || {};
+  const ut = r.meta?.userType;
+  const isService = ut === 'service_provider' || (ut !== 'manufacturer' && (sc.skuCount || 0) === 0 && (sc.caseStudyCount || 0) > 0);
+  const notDet = (it) => !it || !it.value || /^(not detectable|—|none|unknown)$/i.test(String(it.value).trim());
+
+  const econRows = isService
+    ? [
+        sc.serviceLines?.length     && ['Service lines',          String(sc.serviceLines.length), '🟢', sc.serviceLines.slice(0, 6).join(' · ')],
+        sc.caseStudyCount           && ['Case studies / portfolio', String(sc.caseStudyCount),   '🟢', 'Scraped from /case-study, /work, /projects, /portfolio links'],
+        sc.blogVelocity?.postCount  && ['Blog cadence',           `${sc.blogVelocity.postCount} posts`, '🟢', sc.blogVelocity.daysSinceLastPost != null ? `Last post ${sc.blogVelocity.daysSinceLastPost} days ago` : sc.blogVelocity.probedPath || ''],
+        sc.directoryBadges?.length  && ['Directory presence',     String(sc.directoryBadges.length), '🟢', sc.directoryBadges.slice(0, 6).join(' · ')],
+        !notDet(unitEcon.revenueTier) && ['Revenue tier estimate', unitEcon.revenueTier.value,   confIcon(unitEcon.revenueTier.conf), unitEcon.revenueTier.note || ''],
+      ].filter(Boolean)
+    : [
+        !notDet(unitEcon.aov)            && ['AOV',             unitEcon.aov.value,            confIcon(unitEcon.aov.conf),            unitEcon.aov.note || ''],
+        !notDet(unitEcon.skus)           && ['Active SKUs',     unitEcon.skus.value,           confIcon(unitEcon.skus.conf),           unitEcon.skus.note || ''],
+        !notDet(unitEcon.priceRange)     && ['Price Range',     unitEcon.priceRange.value,     confIcon(unitEcon.priceRange.conf),     unitEcon.priceRange.note || ''],
+        !notDet(unitEcon.revenueTier)    && ['Revenue Tier',    unitEcon.revenueTier.value,    confIcon(unitEcon.revenueTier.conf),    unitEcon.revenueTier.note || ''],
+        !notDet(unitEcon.reviewVelocity) && ['Review Velocity', unitEcon.reviewVelocity.value, confIcon(unitEcon.reviewVelocity.conf), unitEcon.reviewVelocity.note || ''],
+      ].filter(Boolean);
+
+  const econTable = econRows.length
+    ? mdTable(['Metric', 'Value', 'Confidence', 'Note'], econRows)
+    : '_No unit-economics signals detected in the snapshot._';
 
   const competitorTable = mdTable(
     ['#', 'Domain', 'Threat', 'Tier', 'Positioning', 'Weakness'],

@@ -191,12 +191,48 @@ function BMCSection() {
     if (!v || v === '—' || v === 'not detectable' || v === 'none' || v === 'unknown') return false;
     return true;
   };
-  const econCards = [
+
+  // Choose the card set based on user type (service_provider vs manufacturer).
+  // For service businesses, AOV / SKUs / review velocity add no signal — swap
+  // in scraped service-specific metrics instead.
+  const ut = r.meta?.userType;
+  const sc = r.scrape || {};
+  const looksLikeService = ut === 'service_provider' || (ut !== 'manufacturer' && (sc.skuCount || 0) === 0 && (sc.caseStudyCount || 0) > 0);
+
+  const serviceCards = [
+    sc.serviceLines?.length ? {
+      lbl: 'Service lines',
+      it: { value: String(sc.serviceLines.length), conf: 'high', note: sc.serviceLines.slice(0, 6).join(' · ') },
+    } : null,
+    sc.caseStudyCount ? {
+      lbl: 'Case studies · portfolio',
+      it: { value: String(sc.caseStudyCount), conf: 'high', note: 'Counted from /case-study, /work, /projects, /portfolio URLs on the homepage.' },
+    } : null,
+    sc.blogVelocity?.postCount ? {
+      lbl: 'Blog cadence',
+      it: {
+        value: `${sc.blogVelocity.postCount} posts`,
+        conf: 'high',
+        note: sc.blogVelocity.daysSinceLastPost != null
+          ? `Last post ${sc.blogVelocity.daysSinceLastPost} days ago · ${sc.blogVelocity.probedPath}`
+          : `Path ${sc.blogVelocity.probedPath}`,
+      },
+    } : null,
+    sc.directoryBadges?.length ? {
+      lbl: 'Directory presence',
+      it: { value: String(sc.directoryBadges.length), conf: 'high', note: sc.directoryBadges.slice(0, 6).join(' · ') },
+    } : null,
+    isDetected(econ.revenueTier) ? { lbl: 'Revenue tier estimate', it: econ.revenueTier } : null,
+  ].filter(Boolean);
+
+  const productCards = [
     { lbl: 'Average order value',   it: econ.aov },
     { lbl: 'Active SKUs',           it: econ.skus },
     { lbl: 'Review velocity',       it: econ.reviewVelocity },
     { lbl: 'Revenue tier estimate', it: econ.revenueTier },
   ].filter(x => isDetected(x.it));
+
+  const econCards = (looksLikeService ? serviceCards : productCards).slice(0, 4);
 
   return (
     <section id="bmc" className="report-section">

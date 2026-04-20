@@ -60,6 +60,9 @@ function buildContextBlock(scrape, userType, pageSpeed) {
 - Marketplace links: ${JSON.stringify(scrape.marketplaceLinks || {})}
 - Image alt coverage: ${scrape.imageAltCoverage?.withAlt || 0} / ${scrape.imageAltCoverage?.total || 0}
 - SKU count (distinct /product links on page): ${scrape.skuCount ?? 0}
+- Case study count (distinct /case-study, /work, /project, /portfolio links): ${scrape.caseStudyCount ?? 0}
+- Service lines inferred from nav: ${JSON.stringify(scrape.serviceLines || [])}
+- Directory / credibility badges detected: ${JSON.stringify(scrape.directoryBadges || [])}
 
 ## Structured Data
 - Schema types present: ${JSON.stringify(scrape.schemaTypes || [])}
